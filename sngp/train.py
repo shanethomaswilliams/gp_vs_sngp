@@ -75,15 +75,14 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
 
                 #get model prediction
                 pred_B = model(x_BF)
-
-
+       
                 #Compute loss according to paper
                 loss_sqerr = square_loss(pred_B, y_B)
 
                 params = flatten_params(model)
-                l2_loss = l2pen_mag * torch.sum(params ** 2)
+                l2_loss = (params**2).sum()
         
-                loss = loss_sqerr +  (l2_loss/2.0)
+                loss = loss_sqerr + (float(l2pen_mag) / n_train) * l2_loss
                 #Backprop
                 loss.backward()
                 optimizer.step()
@@ -115,13 +114,14 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
 
                 pred_va_B = model(x_va_BF)
 
+
                 #Compute loss according to paper
                 va_loss_sq = square_loss(pred_va_B, y_va_B)
 
-                params = flatten_params(model)
-                va_l2_loss = l2pen_mag * torch.sum(params ** 2)
+                # params = flatten_params(model)
+                # l2_loss = (params**2).sum()
         
-                va_loss_total = va_loss_sq +  (va_l2_loss/2.0)
+                va_loss_total = va_loss_sq  # + (float(l2pen_mag) / n_train) * l2_loss
 
                 va_total_loss += va_loss_total.item()
                 va_sqloss += va_loss_sq.item()

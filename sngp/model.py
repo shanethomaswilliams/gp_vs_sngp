@@ -52,20 +52,19 @@ class RFFGP_Reg(torch.nn.Module):
         mean_pred_N = self.linear(features_NR)
         var_pred_N = []
         ## CREATING OUTLINE FOR VARIANCE TO DO MONTE CARLO SAMPLING
-        probas_list = []
         for n in range(batch_size):
             features_R1 = features_NR[n]
             var_pred = features_R1.T @ covariance @ features_R1
             var_pred_N.append(var_pred)
 
-        norm = torch.distributions.normal.Normal(loc=mean_pred_N, scale=torch.sqrt(var_pred_N))
+        norm = torch.distributions.normal.Normal(loc=mean_pred_N, scale=torch.sqrt(var_pred_N[0]))
 
         #Compute samples from out Norm
         samples_NB = norm.sample(sample_shape=(num_samples,))
 
-        MCsamples_N = np.mean(samples_NB, axis=1)
+        # MCsamples_N = np.mean(samples_NB, axis=1)
 
-        return MCsamples_N, var_pred_N         
+        return samples_NB, mean_pred_N, var_pred_N         
 
     def update_precision_from_loader(self, data_loader, device='cpu'):
         self.eval()
@@ -73,29 +72,29 @@ class RFFGP_Reg(torch.nn.Module):
 
         rank = self.rank
 
-        with torch.nograd():
-            for X,_ in data_loader:
-                X = X.to(device)
+        # with torch.nograd():
+        for X,_ in data_loader:
+            X = X.to(device)
 
-                #Just need features for regression case
-                features_NR = self.featurize(X)
-                batch_size = features_NR.shape[0]
+            #Just need features for regression case
+            features_NR = self.featurize(X)
+            batch_size = features_NR.shape[0]
 
-                for i in range(batch_size):
-                    ## RE-ORIENT DIMENSIONS OF FEATURES TO CREATE PHI FROM SNGP PAPER
-                    phi_R1 = features_NR[i].unsqueeze(1)
-                    outer_product_RR = phi_R1 @ phi_R1.t()
+            for i in range(batch_size):
+                ## RE-ORIENT DIMENSIONS OF FEATURES TO CREATE PHI FROM SNGP PAPER
+                phi_R1 = features_NR[i].unsqueeze(1)
+                outer_product_RR = phi_R1 @ phi_R1.t()
 
-                    cov_inv_RR += outer_product_RR
-            #Add identity at end according to formula
-            cov_inv_RR += np.eye(rank)
+                cov_inv_RR += outer_product_RR
+        #Add identity at end according to formula
+        cov_inv_RR += np.eye(rank)
 
         ## UPDATE COVARIANCE VARIABLE
         self.precision_mat = cov_inv_RR
 
     def invert_covariance(self, device='cpu'):
         covariance_RR = torch.inverse(self.precision_mat)
-        return covariance_RR
+        return torch.tensor(covariance_RR, dtype=torch.float32).to(device)
     
     @property
     def lengthscale(self):
