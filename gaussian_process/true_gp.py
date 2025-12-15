@@ -283,7 +283,7 @@ def train_gp(gp, X_train, y_train, n_iterations=100, lr=0.1, verbose=True):
 # =============================================================================
 # CREATE DATASET
 # =============================================================================
-
+'''
 torch.manual_seed(40)
 
 # True function
@@ -446,3 +446,4 @@ for n in [10, 50, 500, 1_000, 1_500]:
     print("- Samples are CORRELATED (smooth, not jagged)")
     print("- They pass through/near training points")
     print("- They diverge far from training data (uncertainty increases)")
+    '''

@@ -25,8 +25,8 @@ def load_data_train(file_path, sample_size, train_percentage = 0.75, random_stat
 
     #Load data
     tensor_DF = torch.load(file_path)
-    x_DF = tensor_DF["x"]
-    y_D = tensor_DF["y"]
+    x_DF = tensor_DF["x"].float()
+    y_D = tensor_DF["y"].float()
 
     
     # Random shuffle of row ids corresponding to all L provided examples
@@ -41,12 +41,17 @@ def load_data_train(file_path, sample_size, train_percentage = 0.75, random_stat
     assert D >= N + V
 
     #Make x_data
-    x_train_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
-    x_valid_VF = x_DF[shuffled_ids_D[N:N+V]].unsqueeze(-1)
+    if x_DF.dim() == 1:
+        x_train_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
+        x_valid_VF = x_DF[shuffled_ids_D[N:N+V]].unsqueeze(-1)
+    else:
+        x_train_NF = x_DF[shuffled_ids_D[0:N]]
+        x_valid_VF = x_DF[shuffled_ids_D[N:N+V]]
+
 
     #Make SNGP y_data
-    y_SNGP_train_N1 = y_D[shuffled_ids_D[0:N]]
-    y_SNGP_valid_V1 = y_D[shuffled_ids_D[N:N+V]]
+    y_SNGP_train_N1 = y_D[shuffled_ids_D[0:N]].unsqueeze(-1)
+    y_SNGP_valid_V1 = y_D[shuffled_ids_D[N:N+V]].unsqueeze(-1)
 
     #Make GP y_data
     y_GP_train_N = y_SNGP_train_N1.unsqueeze(-1)
@@ -83,8 +88,8 @@ def load_data_test(file_path, sample_size, random_state=42, shuffle = True):
 
     #Load data
     tensor_DF = torch.load(file_path)
-    x_DF = tensor_DF["x"]
-    y_D = tensor_DF["y"]
+    x_DF = tensor_DF["x"].float()
+    y_D = tensor_DF["y"].float()
 
     
     # Random shuffle of row ids corresponding to all L provided examples

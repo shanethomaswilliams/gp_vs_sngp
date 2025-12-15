@@ -8,6 +8,12 @@ from sklearn import metrics # type: ignore
 import torch # type: ignore
 from torch.utils.data import TensorDataset, DataLoader # type: ignore
 import numpy as np # type: ignore
+import sys
+import os
+
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from loss import square_loss
 
 
@@ -112,6 +118,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 x_va_BF = x_va.to(device)
                 y_va_B = y_va.to(device)
 
+
                 pred_va_B = model(x_va_BF)
 
 
@@ -127,6 +134,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 va_sqloss += va_loss_sq.item()
                 va_mse += metrics.mean_squared_error(y_va_B.detach().cpu().numpy(), 
                                                      pred_va_B.detach().cpu().numpy())
+                                                     
         epochs.append(epoch)
         tr_info['loss'].append(tr_loss)
         tr_info['sqloss'].append(tr_sqloss)
@@ -157,6 +165,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
         if do_early_stopping and wait_enough:
             print("Stopped early.")
             break
+
 
     print(f"Finished after epoch {epoch}, best epoch={best_epoch}")
     model.to(device)

@@ -50,8 +50,8 @@ def makeSinPT(num_examples, random_state = None,
     y = np.sin(2 * x) - np.cos(x) + noise * rng.normal(size = num_examples)
 
 
-    X_tensor = torch.tensor(x)
-    y_tensor = torch.tensor(y)
+    X_tensor = torch.tensor(x, dtype=torch.float32)
+    y_tensor = torch.tensor(y, dtype=torch.float32)
 
     data_dict = {'x':X_tensor,
                  'y':y_tensor}
@@ -74,8 +74,8 @@ def makeCrazySinPT(num_examples, random_state = None,
     x_vals = rng.uniform(low = dom_range[0], high=dom_range[1], size = num_examples)
     y_vals = np.sin(10 * x_vals) - np.cos(7 * x_vals) + noise * rng.normal(size = num_examples)
 
-    X_tensor = torch.tensor(x_vals)
-    y_tensor = torch.tensor(y_vals)
+    X_tensor = torch.tensor(x_vals, dtype=torch.float32)
+    y_tensor = torch.tensor(y_vals, dtype=torch.float32)
 
     data_dict = {'x':X_tensor,
                  'y':y_tensor}
@@ -95,7 +95,7 @@ def makeFriedmanPT(n_samples, random_state=None,
         X, y = make_friedman3(n_samples=n_samples, noise=noise, random_state=random_state)
     
     X_tensor = torch.tensor(X, dtype=torch.float32)
-    y_tensor = torch.tensor(y, dtype=torch.long)
+    y_tensor = torch.tensor(y, dtype=torch.float32)
     
     data_dict = {'x':X_tensor,
                  'y':y_tensor}
