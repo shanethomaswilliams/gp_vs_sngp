@@ -44,9 +44,11 @@ def load_data_train(file_path, sample_size, train_percentage = 0.75, random_stat
     if x_DF.dim() == 1:
         x_train_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
         x_valid_VF = x_DF[shuffled_ids_D[N:N+V]].unsqueeze(-1)
+        x_GP_train_N = x_DF[shuffled_ids_D[0:N+V]].unsqueeze(-1)
     else:
         x_train_NF = x_DF[shuffled_ids_D[0:N]]
         x_valid_VF = x_DF[shuffled_ids_D[N:N+V]]
+        x_GP_train_N = x_DF[shuffled_ids_D[0:N+V]]
 
 
     #Make SNGP y_data
@@ -54,23 +56,20 @@ def load_data_train(file_path, sample_size, train_percentage = 0.75, random_stat
     y_SNGP_valid_V1 = y_D[shuffled_ids_D[N:N+V]].unsqueeze(-1)
 
     #Make GP y_data
-    y_GP_train_N = y_SNGP_train_N1.unsqueeze(-1)
-    y_GP_valid_V = y_SNGP_valid_V1.unsqueeze(-1)
+    y_GP_train_N = y_D[shuffled_ids_D[0:N+V]].squeeze()
 
     #Creates datasets
-    GP_train_dataset = TensorDataset(x_train_NF, y_GP_train_N)
-    GP_valid_dataset = TensorDataset(x_valid_VF, y_GP_valid_V)
+    GP_train_dataset = TensorDataset(x_GP_train_N, y_GP_train_N)
 
     SNGP_train_dataset = TensorDataset(x_train_NF, y_SNGP_train_N1)
     SNGP_valid_dataset = TensorDataset(x_valid_VF, y_SNGP_valid_V1)
 
-    GP_train_loader = DataLoader(GP_train_dataset, batch_size=N, shuffle=shuffle)
-    GP_valid_loader = DataLoader(GP_valid_dataset, batch_size=V, shuffle=shuffle)
+    GP_train_loader = DataLoader(GP_train_dataset, batch_size=N+V, shuffle=shuffle)
 
     SNGP_train_loader = DataLoader(SNGP_train_dataset, batch_size=N, shuffle=shuffle)
     SNGP_valid_loader = DataLoader(SNGP_valid_dataset, batch_size=V, shuffle=shuffle)
 
-    return GP_train_loader, GP_valid_loader, SNGP_train_loader, SNGP_valid_loader
+    return GP_train_loader, SNGP_train_loader, SNGP_valid_loader
 
 
 '''
@@ -103,13 +102,16 @@ def load_data_test(file_path, sample_size, random_state=42, shuffle = True):
     assert D >= N
 
     #Make x_data
-    x_test_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
+    if x_DF.dim() == 1:
+        x_test_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
+    else:
+        x_test_NF = x_DF[shuffled_ids_D[0:N]]
 
     #Make SNGP y_data
-    y_SNGP_test_N1 = y_D[shuffled_ids_D[0:N]]
+    y_SNGP_test_N1 = y_D[shuffled_ids_D[0:N]].unsqueeze(-1)
 
     #Make GP y_data
-    y_GP_test_N = y_SNGP_test_N1.unsqueeze(-1)
+    y_GP_test_N = y_SNGP_test_N1.squeeze()
 
     #Creates datasets
     GP_test_dataset = TensorDataset(x_test_NF, y_GP_test_N)

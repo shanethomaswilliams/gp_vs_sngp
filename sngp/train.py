@@ -22,7 +22,7 @@ def flatten_params(model, excluded_params=['lengthscale_param', 'outputscale_par
 
 def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 n_epochs=10, lr=0.001, l2pen_mag=0.0, data_order_seed=42,
-                model_filename='best_model.pth',
+                model_filename=None,
                 do_early_stopping=True,
                 n_epochs_without_va_improve_before_early_stop=15,
                 ):
@@ -155,9 +155,11 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
             best_tr_err_rate = tr_mse
             best_va_err_rate = va_mse
             curr_wait = 0
-            model = model.cpu()
-            torch.save(model.state_dict(), model_filename)
-            model.to(device)
+            if model_filename != None:
+                model = model.cpu()
+                torch.save(model.state_dict(), model_filename)
+                model.to(device)
+            
         else:
             curr_wait += 1
 
@@ -169,7 +171,8 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
 
     print(f"Finished after epoch {epoch}, best epoch={best_epoch}")
     model.to(device)
-    model.load_state_dict(torch.load(model_filename, map_location=torch.device('cpu')))    
+    if model_filename != None:
+        model.load_state_dict(torch.load(model_filename, map_location=torch.device('cpu')))    
     result = { 
         'data_order_seed':data_order_seed,
         'lr':lr, 'n_epochs':n_epochs, 'l2pen_mag':l2pen_mag,

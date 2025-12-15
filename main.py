@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
 
     #Load Datasets
-    GP_train, GP_val, SNGP_train, SNGP_val = load_data_train("dataset/Data/Noisy/"+args.dataset,
+    GP_train, SNGP_train, SNGP_val = load_data_train("dataset/Data/Noisy/"+args.dataset,
                                                              args.num_examples,
                                                              train_percentage= args.tr_ratio,
                                                              random_state=args.seed)
@@ -63,12 +63,12 @@ if __name__ == '__main__':
     if args.modelName == "SNGP":
 
         saveFolder = args.savePath
-        modelID = "SNGP_R%d_LS%.2f_OS%.2f_%s" %(args.rank,
-                                                args.lenScale,
-                                                args.outScale,
-                                                args.dataset)
-        os.makedirs(saveFolder + "/model", exist_ok=True)
-        os.makedirs(saveFolder + "/info", exist_ok=True)
+        modelID = "SNGP_R%d_LS%.2f_OS%.2f_%d%s" %(args.rank,
+                                                  args.lenScale,
+                                                  args.outScale,
+                                                  args.num_examples,
+                                                  args.dataset)
+        os.makedirs(saveFolder + "/SNGP/info", exist_ok=True)
 
         #Make SNGP Model
         sngp_model = model.RFFGP_Reg(in_features=F,
@@ -82,9 +82,24 @@ if __name__ == '__main__':
         # I.E. 0.001 diverges but 0.0005 converges so be careful with it
         trained_model, info = train.train_model(sngp_model, device, 
                                                 SNGP_train, SNGP_val, l2pen_mag=1.0,
-                                                n_epochs=1_000, lr=0.0005, do_early_stopping=True, 
-                                                model_filename=saveFolder +"/model/" + modelID)
-        torch.save(info, saveFolder +"/info/" + modelID)
+                                                n_epochs=1_000, lr=0.0005, do_early_stopping=True)
+        torch.save(info, saveFolder +"/SNGP/info/" + modelID)
+
+    elif args.modelName == "GP":
+
+        saveFolder = args.savePath
+        modelID = "GP_%d%s" %(args.num_examples,
+                              args.dataset)
+        os.makedirs(saveFolder + "/GP/info", exist_ok=True)
+
+        gp = FullGPCholesky(lengthscale=1.0, outputscale=1.0, noise=0.2, learn_hyperparams=True)
+        for X_train, y_train in GP_train:
+            info = train_gp(gp, X_train, y_train, n_iterations=400, lr=0.01)
+            gp.fit(X_train, y_train)
+            #Don't save model cause they big boyz
+            #torch.save(gp, saveFolder + "/GP/model/" + modelID)
+            torch.save(info, saveFolder + "/GP/info/" + modelID)
+
 
     
 
