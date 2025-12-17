@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import torch
+import numpy as np
 torch.set_default_dtype(torch.float32) 
 
 # =============================================================================
@@ -275,10 +276,187 @@ def train_gp(gp, X_train, y_train, n_iterations=100, lr=0.1, verbose=True):
             print(f"Iter {i:3d} | Loss: {loss.item():8.3f} | "
                   f"lengthscale: {gp.kernel.lengthscale.item():.3f} | "
                   f"outputscale: {gp.kernel.outputscale.item():.3f} | "
-                  f"noise: {gp.noise.item():.3f}")
+                  f"noise: {gp.noise.item():.3f}", flush=True)
     
     return losses
 
+
+def evaluate_gp(gp, X_test, y_test):
+    """
+    Evaluate GP performance on test set.
+    
+    Args:
+        gp: Fitted GP model (FullGP or FullGPCholesky)
+        X_test: Test inputs, shape (M, D)
+        y_test: True test outputs, shape (M,)
+    
+    Returns:
+        dict with keys:
+            - 'mse': Mean squared error
+            - 'rmse': Root mean squared error
+            - 'test_ll': Average test log-likelihood (per point)
+            - 'total_test_ll': Total test log-likelihood
+    """
+    # Get predictions
+    mean, var, cov = gp.predict(X_test)
+    
+    # =========================================================================
+    # MSE and RMSE (pointwise metrics)
+    # =========================================================================
+    squared_errors = (y_test - mean) ** 2
+    mse = squared_errors.mean().item()
+    rmse = torch.sqrt(squared_errors.mean()).item()
+
+    # =========================================================================
+    # Test Log-Likelihood (accounts for uncertainty)
+    # =========================================================================
+    # log p(y_test | X_test, D_train) where y_test ~ N(μ*, Σ*)
+    # 
+    # log p(y) = -1/2 * (y - μ)^T Σ^{-1} (y - μ) - 1/2 log|Σ| - n/2 log(2π)
+    # =========================================================================
+    
+    n_test = len(y_test)
+    residual = y_test - mean  # shape (M,)
+    
+    # For numerical stability, use Cholesky decomposition of Σ*
+    # Add small jitter for numerical stability
+    jitter = 1e-6
+    cov_stable = cov + jitter * torch.eye(n_test)
+    
+    try:
+        L_test = torch.linalg.cholesky(cov_stable)
+        
+        # Solve L_test @ α = residual for α
+        alpha = torch.linalg.solve_triangular(L_test, residual.unsqueeze(1), upper=False).squeeze()
+        
+        # Mahalanobis distance: (y - μ)^T Σ^{-1} (y - μ) = α^T α
+        mahalanobis = alpha @ alpha
+        
+        # Log determinant: log|Σ| = 2 * sum(log(diag(L)))
+        log_det = 2 * torch.sum(torch.log(torch.diag(L_test)))
+        
+    except RuntimeError as e:
+        print(f"Warning: Cholesky failed, using eigendecomposition fallback")
+        # Fallback: eigendecomposition
+        eigenvalues, eigenvectors = torch.linalg.eigh(cov_stable)
+        eigenvalues_clamped = eigenvalues.clamp(min=1e-8)
+        
+        # Σ^{-1} = V @ diag(1/λ) @ V^T
+        cov_inv = eigenvectors @ torch.diag(1.0 / eigenvalues_clamped) @ eigenvectors.T
+        mahalanobis = residual @ cov_inv @ residual
+        log_det = torch.sum(torch.log(eigenvalues_clamped))
+    
+    # Compute log-likelihood
+    log_2pi = torch.log(torch.tensor(2 * torch.pi))
+    total_test_ll = -0.5 * (mahalanobis + log_det + n_test * log_2pi)
+    avg_test_ll = total_test_ll / n_test
+    
+    return {
+        'mse': mse,
+        'rmse': rmse,
+        'test_ll': avg_test_ll.item(),  # per-point log-likelihood
+        'total_test_ll': total_test_ll.item()
+    }
+
+def getSin(X_data, noise=0.0):
+    """Generate clean (noise=0) or noisy function values"""
+    if noise > 0:
+        return np.sin(2 * X_data) - np.cos(X_data) + noise * np.random.randn(len(X_data))
+    else:
+        return np.sin(2 * X_data) - np.cos(X_data)
+
+def getCrazySin(X_data, noise=0.0):
+    """Generate clean (noise=0) or noisy function values"""
+    if noise > 0:
+        return np.sin(10 * X_data) - np.cos(7 * X_data) + noise * np.random.randn(len(X_data))
+    else:
+        return np.sin(10 * X_data) - np.cos(7 * X_data)
+
+def save_fig(gp, X_test, dataset, fig_path, seed=42):
+    np.random.seed(seed)
+    
+    # ---- Determine extended range ----
+    x_test_1d = X_test.squeeze(-1)
+    x_min = x_test_1d.min().item()
+    x_max = x_test_1d.max().item()
+    x_range = x_max - x_min
+    
+    # Extend by 10% on each side
+    x_extended_min = x_min - 0.1*x_range
+    x_extended_max = x_max + 0.1*x_range
+    
+    # ---- Generate additional noisy test points in extended regions ----
+    # Sample ~50 points in each extended region
+    n_extra_left = 50
+    n_extra_right = 50
+    
+    x_extra_left = np.random.uniform(x_extended_min, x_min, n_extra_left)
+    x_extra_right = np.random.uniform(x_max, x_extended_max, n_extra_right)
+    x_extra = np.concatenate([x_extra_left, x_extra_right])
+    
+    # Generate noisy y values for these extra points
+    if dataset == "Sin":
+        y_extra = getSin(x_extra, noise=0.1)
+    elif dataset == "CrazySin":
+        y_extra = getCrazySin(x_extra, noise=0.1)
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    
+    # Convert to torch and combine with original test set
+    X_extra = torch.tensor(x_extra, dtype=torch.float32).unsqueeze(-1)
+    X_test_extended = torch.cat([X_test, X_extra], dim=0)
+    
+    # ---- Get predictions on extended test set ----
+    mean, var, cov = gp.predict(X_test_extended)
+    std = torch.sqrt(var.clamp(min=1e-6))
+    
+    # Sort everything for plotting
+    x_extended_1d = X_test_extended.squeeze(-1)
+    idx_extended = torch.argsort(x_extended_1d)
+    x_extended_sorted = x_extended_1d[idx_extended]
+    mean_sorted = mean[idx_extended]
+    std_sorted = std[idx_extended]
+    
+    # ---- Generate clean data for true function (dense for smooth line) ----
+    x_clean = np.linspace(x_extended_min, x_extended_max, 500)
+    
+    if dataset == "Sin":
+        y_clean = getSin(x_clean, noise=0.0)
+    elif dataset == "CrazySin":
+        y_clean = getCrazySin(x_clean, noise=0.0)
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    
+    # ---- Plotting ----
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    
+    # Confidence band (now extends to cover clean function range)
+    ax.fill_between(
+        x_extended_sorted.detach().numpy(),
+        (mean_sorted - 2*std_sorted).detach().numpy(),
+        (mean_sorted + 2*std_sorted).detach().numpy(),
+        alpha=0.3, color='blue', label='95% confidence (±2σ)'
+    )
+    
+    # Posterior mean
+    ax.plot(x_extended_sorted.detach().numpy(), mean_sorted.detach().numpy(), 
+            'b-', linewidth=2, label='Posterior mean μ*')
+    
+    # True function (dotted line)
+    ax.plot(x_clean, y_clean, 
+            'k--', linewidth=1, label='True function')
+    
+    ax.set_xlabel('x', fontsize=12)
+    ax.set_ylabel('y', fontsize=12)
+    ax.set_title('GP Regression: Full Closed Form', fontsize=14)
+    ax.legend(loc='upper right')
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(x_extended_sorted.min().item(), x_extended_sorted.max().item())
+    ax.set_ylim(-3, 3)
+    
+    plt.tight_layout()
+    plt.savefig(fig_path, dpi=600)
+    plt.close()
 
 # =============================================================================
 # CREATE DATASET

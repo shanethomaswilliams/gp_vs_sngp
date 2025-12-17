@@ -1,0 +1,20 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/11.2"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/11.2"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Traceback (most recent call last):
+  File "/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/main.py", line 169, in <module>
+    
+  File "/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/gaussian_process/true_gp.py", line 264, in train_gp
+    gp.fit(X_train, y_train)
+  File "/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/gaussian_process/true_gp.py", line 159, in fit
+    self.L = torch.linalg.cholesky(K_XX_noisy)
+torch._C._LinAlgError: torch.linalg_cholesky: The factorization could not be completed because the input is not positive-definite (the leading minor of order 1451 is not positive-definite).

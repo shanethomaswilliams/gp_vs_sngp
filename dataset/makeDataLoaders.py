@@ -83,7 +83,7 @@ Returns:
     GP_test_loader: Train loader formated for GP
     SNGP_test_loader: Train loader formated for SNGP 
 '''
-def load_data_test(file_path, sample_size, random_state=42, shuffle = True):
+def load_data_test(file_path, sample_size=1_000, random_state=42, shuffle=True):
 
     #Load data
     tensor_DF = torch.load(file_path)

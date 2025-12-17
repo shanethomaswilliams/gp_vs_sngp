@@ -1,0 +1,31 @@
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on Friedman with N=1000
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+torch.Size([1000])
+torch.Size([1000, 1000])
+
+============================================================
+COVARIANCE DIAGNOSTICS
+============================================================
+Matrix asymmetry (should be ~0): 1.74e-05
+
+Eigenvalue range: [3.66e-02, 3.90e-02]
+Number negative: 0 / 1000
+Most negative: 3.66e-02
+Smallest positive: 3.66e-02
+Condition number: 1.07e+00
+
+Test set size: 1000
+Hyperparameters:
+  lengthscale: 1.0000
+  outputscale: 1.0000
+  noise: 0.2000
+============================================================
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/GP/Friedman_1000_1001/logs
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/logs/GP_VS_SNGP_25036731.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/logs/GP_VS_SNGP_25036731.err

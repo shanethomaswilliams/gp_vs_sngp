@@ -1,0 +1,31 @@
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on Sin with N=1000
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+torch.Size([1000])
+torch.Size([1000, 1000])
+
+============================================================
+COVARIANCE DIAGNOSTICS
+============================================================
+Matrix asymmetry (should be ~0): 2.98e-07
+
+Eigenvalue range: [-2.64e-05, 4.00e-02]
+Number negative: 490 / 1000
+Most negative: -2.64e-05
+Smallest positive: 8.01e-09
+Condition number: 5.00e+06
+
+Test set size: 1000
+Hyperparameters:
+  lengthscale: 1.0000
+  outputscale: 1.0000
+  noise: 0.2000
+============================================================
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/GP/Sin_1000_1001/logs
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/logs/GP_VS_SNGP_25036729.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test/logs/GP_VS_SNGP_25036729.err

@@ -86,11 +86,21 @@ class RFFGP_Reg(torch.nn.Module):
                 outer_product_RR = phi_R1 @ phi_R1.t()
 
                 cov_inv_RR += outer_product_RR
+
         #Add identity at end according to formula
         cov_inv_RR += np.eye(rank)
 
         ## UPDATE COVARIANCE VARIABLE
         self.precision_mat = cov_inv_RR
+
+    def get_mean_covaraince(self, X_test, covaraince, device='cpu'):
+        features_NR = self.featurize(h)
+
+        mean = self.linear(features)
+        cov = features_R1.T @ covariance @ features_R1
+
+        return mean, cov
+
 
     def invert_covariance(self, device='cpu'):
         covariance_RR = torch.inverse(self.precision_mat)
