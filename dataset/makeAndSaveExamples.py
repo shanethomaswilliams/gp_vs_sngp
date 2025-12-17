@@ -31,5 +31,5 @@ dtmk.makeFriedmanPT(100_000, random_state=1337,
                     filename= dataN + "/Friedman")
 #Make Clean Friedman data for testing
 dtmk.makeFriedmanPT(100_000, random_state=42,
-                    noise = 0.1,
+                    noise = 0.0,
                     filename= dataC + "/Friedman")

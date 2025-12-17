@@ -93,14 +93,24 @@ class RFFGP_Reg(torch.nn.Module):
         ## UPDATE COVARIANCE VARIABLE
         self.precision_mat = cov_inv_RR
 
-    def get_mean_covaraince(self, X_test, covaraince, device='cpu'):
-        features_NR = self.featurize(h)
+    def get_mean_variance(self, X_test, covariance, noise=0.0, device='cpu'):
+        features_NR = self.featurize(X_test).squeeze()
+        N = features_NR.shape[0]
 
-        mean = self.linear(features)
-        cov = features_R1.T @ covariance @ features_R1
+        mean_N = self.linear(features_NR)
+        var_N = []
+        for n in range(N):
+            phi_R = features_NR[n]  # (R,)
+            var = phi_R.T @ covariance @ phi_R  # scalar
+            if noise > 0:
+                var = var + noise**2
+            var_N.append(var)
 
-        return mean, cov
+        var_N = torch.stack(var_N)  # (N,)
 
+        mean_N = mean_N.squeeze()
+        var_N = var_N.squeeze()
+        return mean_N, var_N
 
     def invert_covariance(self, device='cpu'):
         covariance_RR = torch.inverse(self.precision_mat)
@@ -113,4 +123,3 @@ class RFFGP_Reg(torch.nn.Module):
     @property
     def outputscale(self):
         return torch.nn.functional.softplus(self.outputscale_param)
-            

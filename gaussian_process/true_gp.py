@@ -5,6 +5,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import torch
 import numpy as np
+from tqdm import tqdm
 torch.set_default_dtype(torch.float32) 
 
 # =============================================================================
@@ -244,42 +245,80 @@ class FullGPCholesky(nn.Module):
 
 
 def train_gp(gp, X_train, y_train, n_iterations=100, lr=0.1, verbose=True):
-    """
-    Train GP by optimizing marginal log-likelihood.
-    
-    Args:
-        gp: FullGPCholesky model
-        X_train, y_train: Training data
-        n_iterations: Number of optimization steps
-        lr: Learning rate
-        verbose: Print progress
-    """
+    """Train GP with gradient clipping and hyperparameter constraints"""
     optimizer = torch.optim.Adam(gp.parameters(), lr=lr)
     losses = []
     
-    for i in range(n_iterations):
-        optimizer.zero_grad()
-        
-        # Fit GP with current hyperparameters
-        gp.fit(X_train, y_train)
-        
-        # Compute negative marginal log-likelihood
-        loss = gp.negative_marginal_log_likelihood()
-        
-        # Backprop and update hyperparameters
-        loss.backward()
-        optimizer.step()
-        
-        losses.append(loss.item())
-        
-        if verbose and (i % 10 == 0 or i == n_iterations - 1):
-            print(f"Iter {i:3d} | Loss: {loss.item():8.3f} | "
-                  f"lengthscale: {gp.kernel.lengthscale.item():.3f} | "
-                  f"outputscale: {gp.kernel.outputscale.item():.3f} | "
-                  f"noise: {gp.noise.item():.3f}", flush=True)
+    pbar = tqdm(range(n_iterations), desc="Training GP", disable=not verbose)
+    
+    best_loss = float('inf')
+    patience_counter = 0
+    
+    for i in pbar:
+        try:
+            optimizer.zero_grad()
+            
+            # Fit GP with current hyperparameters
+            gp.fit(X_train, y_train)
+            
+            # Compute negative marginal log-likelihood
+            loss = gp.negative_marginal_log_likelihood()
+            
+            # Check for NaN/Inf
+            if not torch.isfinite(loss):
+                print(f"\nNon-finite loss at iter {i}, stopping")
+                break
+            
+            # Backprop
+            loss.backward()
+            
+            # CRITICAL: Clip gradients
+            torch.nn.utils.clip_grad_norm_(gp.parameters(), max_norm=1.0)
+            
+            optimizer.step()
+            
+            # CRITICAL: Constrain hyperparameters
+            with torch.no_grad():
+                # Lengthscale: [0.01, 50] (relaxed for high-D)
+                gp.kernel.log_lengthscale.clamp_(
+                    torch.log(torch.tensor(0.01)),
+                    torch.log(torch.tensor(100.0))
+                )
+                # Outputscale: [0.01, 10]
+                gp.kernel.log_outputscale.clamp_(
+                    torch.log(torch.tensor(0.01)),
+                    torch.log(torch.tensor(100.0))
+                )
+                # Noise: [0.001, 1.0]
+                gp.log_noise.clamp_(
+                    torch.log(torch.tensor(0.001)),
+                    torch.log(torch.tensor(1.0))
+                )
+            
+            losses.append(loss.item())
+            
+            # Early stopping
+            if loss.item() < best_loss:
+                best_loss = loss.item()
+                patience_counter = 0
+            else:
+                patience_counter += 1
+                if patience_counter >= 200:
+                    print(f"\nEarly stop at iter {i}")
+                    break
+            
+            pbar.set_postfix({
+                'loss': f'{loss.item():.3f}',
+                'lengthscale': f'{gp.kernel.lengthscale.item():.3f}',
+                'outputscale': f'{gp.kernel.outputscale.item():.3f}',
+                'noise': f'{gp.noise.item():.3f}'
+            })
+            
+        except torch._C._LinAlgError:
+            print(f"\nCholesky failed at iter {i}, stopping")
+            break
     
     return losses
-
 
 def evaluate_gp(gp, X_test, y_test):
     """
@@ -372,8 +411,14 @@ def getCrazySin(X_data, noise=0.0):
     else:
         return np.sin(10 * X_data) - np.cos(7 * X_data)
 
-def save_fig(gp, X_test, dataset, fig_path, seed=42):
+def save_fig(gp, X_test, y_test, dataset, fig_path, seed=42):
     np.random.seed(seed)
+
+    # ---- Sample 100 random points from test set for plotting ----
+    n_plot_points = min(100, len(X_test))  # Don't sample more than available
+    plot_indices = np.random.choice(len(X_test), n_plot_points, replace=False)
+    X_plot = X_test[plot_indices]
+    y_plot = y_test[plot_indices]
     
     # ---- Determine extended range ----
     x_test_1d = X_test.squeeze(-1)
@@ -382,8 +427,8 @@ def save_fig(gp, X_test, dataset, fig_path, seed=42):
     x_range = x_max - x_min
     
     # Extend by 10% on each side
-    x_extended_min = x_min - 0.1*x_range
-    x_extended_max = x_max + 0.1*x_range
+    x_extended_min = x_min - 0.2*x_range
+    x_extended_max = x_max + 0.2*x_range
     
     # ---- Generate additional noisy test points in extended regions ----
     # Sample ~50 points in each extended region
@@ -408,6 +453,7 @@ def save_fig(gp, X_test, dataset, fig_path, seed=42):
     
     # ---- Get predictions on extended test set ----
     mean, var, cov = gp.predict(X_test_extended)
+    var = var + gp.noise**2
     std = torch.sqrt(var.clamp(min=1e-6))
     
     # Sort everything for plotting
@@ -445,6 +491,11 @@ def save_fig(gp, X_test, dataset, fig_path, seed=42):
     # True function (dotted line)
     ax.plot(x_clean, y_clean, 
             'k--', linewidth=1, label='True function')
+    
+    # Sampled test points (red circles)
+    ax.scatter(X_plot.squeeze().detach().numpy(), 
+               y_plot.squeeze().detach().numpy(), 
+               c='red', s=30, zorder=5, alpha=0.6, label='Test data (sample)')
     
     ax.set_xlabel('x', fontsize=12)
     ax.set_ylabel('y', fontsize=12)

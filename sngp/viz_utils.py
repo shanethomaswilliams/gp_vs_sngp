@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt # type: ignore
 from matplotlib.colors import LinearSegmentedColormap # type: ignore
 import numpy as np # type: ignore
 import torch # type: ignore
-import src.utils
 from tqdm import tqdm
 import math
 
@@ -543,4 +542,114 @@ def plot_probabilities(model, loader, device='cpu', filename='plot_probabilities
     plt.close(fig)
 
 
+def getSin(X_data, noise=0.0):
+    """Generate clean (noise=0) or noisy function values"""
+    if noise > 0:
+        return np.sin(2 * X_data) - np.cos(X_data) + noise * np.random.randn(len(X_data))
+    else:
+        return np.sin(2 * X_data) - np.cos(X_data)
 
+def getCrazySin(X_data, noise=0.0):
+    """Generate clean (noise=0) or noisy function values"""
+    if noise > 0:
+        return np.sin(10 * X_data) - np.cos(7 * X_data) + noise * np.random.randn(len(X_data))
+    else:
+        return np.sin(10 * X_data) - np.cos(7 * X_data)
+
+def save_sngp_fig(sngp_model, X_test, y_test, covariance, dataset, fig_path, seed=42):
+    np.random.seed(seed)
+    
+    # ---- Determine extended range ----
+    x_test_1d = X_test.squeeze(-1)
+    x_min = x_test_1d.min().item()
+    x_max = x_test_1d.max().item()
+    x_range = x_max - x_min
+    
+    # Extend by 10% on each side
+    x_extended_min = x_min - 0.2*x_range
+    x_extended_max = x_max + 0.2*x_range
+    
+    # ---- Sample 100 random points from test set for plotting ----
+    n_plot_points = min(100, len(X_test))  # Don't sample more than available
+    plot_indices = np.random.choice(len(X_test), n_plot_points, replace=False)
+    X_plot = X_test[plot_indices]
+    y_plot = y_test[plot_indices]
+    
+    # ---- Generate additional noisy test points in extended regions ----
+    n_extra_left = 50
+    n_extra_right = 50
+    
+    x_extra_left = np.random.uniform(x_extended_min, x_min, n_extra_left)
+    x_extra_right = np.random.uniform(x_max, x_extended_max, n_extra_right)
+    x_extra = np.concatenate([x_extra_left, x_extra_right])
+    
+    # Generate noisy y values for these extra points
+    if dataset == "Sin":
+        y_extra = getSin(x_extra, noise=0.1)
+    elif dataset == "CrazySin":
+        y_extra = getCrazySin(x_extra, noise=0.1)
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    
+    # Convert to torch and combine with original test set
+    X_extra = torch.tensor(x_extra, dtype=torch.float32).unsqueeze(-1)
+    X_test_extended = torch.cat([X_test, X_extra], dim=0)
+    
+    # ---- Get predictions on extended test set ----
+    mean, var = sngp_model.get_mean_variance(X_test_extended, covariance, noise=0.1, device='cpu')
+    mean = mean.squeeze(-1)
+    var = var.squeeze(-1)
+    std = torch.sqrt(var.clamp(min=1e-6))
+    
+    # Sort everything for plotting
+    x_extended_1d = X_test_extended.squeeze(-1)
+    idx_extended = torch.argsort(x_extended_1d)
+    x_extended_sorted = x_extended_1d[idx_extended]
+    mean_sorted = mean[idx_extended]
+    std_sorted = std[idx_extended]
+    
+    # ---- Generate clean data for true function (dense for smooth line) ----
+    x_clean = np.linspace(x_extended_min, x_extended_max, 5_000)
+    
+    if dataset == "Sin":
+        y_clean = getSin(x_clean, noise=0.0)
+    elif dataset == "CrazySin":
+        y_clean = getCrazySin(x_clean, noise=0.0)
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    
+    # ---- Plotting ----
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    
+    # Confidence band
+    ax.fill_between(
+        x_extended_sorted.detach().numpy(),
+        (mean_sorted - 2*std_sorted).detach().numpy(),
+        (mean_sorted + 2*std_sorted).detach().numpy(),
+        alpha=0.3, color='blue', label='95% confidence (±2σ)'
+    )
+    
+    # Posterior mean
+    ax.plot(x_extended_sorted.detach().numpy(), mean_sorted.detach().numpy(), 
+            'b-', linewidth=2, label='Posterior mean μ*')
+    
+    # True function (dotted line)
+    ax.plot(x_clean, y_clean, 
+            'k--', linewidth=1, label='True function')
+    
+    # Sampled test points (red circles)
+    ax.scatter(X_plot.squeeze().detach().numpy(), 
+               y_plot.squeeze().detach().numpy(), 
+               c='red', s=30, zorder=5, alpha=0.6, label='Test data (sample)')
+    
+    ax.set_xlabel('x', fontsize=12)
+    ax.set_ylabel('y', fontsize=12)
+    ax.set_title('SNGP Regression', fontsize=14)
+    ax.legend(loc='upper right')
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(x_extended_sorted.min().item(), x_extended_sorted.max().item())
+    ax.set_ylim(-3, 3)
+    
+    plt.tight_layout()
+    plt.savefig(fig_path, dpi=600)
+    plt.close()

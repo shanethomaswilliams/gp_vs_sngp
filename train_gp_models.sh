@@ -25,9 +25,10 @@ export learn_hyperparams="False"
 
 
 ########################### HYPERPARAMETER SEARCH SPACE ################################
-declare -a datasets=("Sin" "CrazySin" "Friedman")
+# declare -a datasets=("Sin" "CrazySin" "Friedman")
+declare -a datasets=("Friedman")
 # declare -a num_examples=($(seq 1000 1000 75000))
-declare -a num_examples=($(seq 1000 1000 1000))
+declare -a num_examples=($(seq 1500 1500 1500))
 declare -a seeds=(1001)
 
 
