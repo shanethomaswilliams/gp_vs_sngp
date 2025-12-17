@@ -39,7 +39,7 @@ def get_args_parser():
     #Add arguments for dataset
     parser.add_argument("--dataset", default="Sin", choices=["Sin", "CrazySin", "Friedman"], 
                         help="name of dataset to run")
-    parser.add_argument("--num_examples", type=int, default=1_000, help="Number of examples to use for training")
+    parser.add_argument("--num_examples", type=int, default=2_000, help="Number of examples to use for training")
     parser.add_argument("--tr_ratio", type = float, default= 0.7, help="Percent of data to use as training")
     parser.add_argument("--learn_hyperparams", type=str2bool, default=False, help="Whether or nt you learn hyperparemeters")
     parser.add_argument("--n_epochs_gp_train", type=int, default=10_000, help="Number of epochs to train GP hyperparams")
@@ -182,9 +182,9 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Using CUDA:", torch.cuda.get_device_name(device))
-    # elif torch.backends.mps.is_available():
-    #     device = torch.device("mps")
-    #     print("Using MPS")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using MPS")
     else:
         device = torch.device("cpu")
         print("Using CPU")
@@ -192,14 +192,14 @@ if __name__ == '__main__':
 
     #Load Datasets
     print("Making Datasets...", flush=True)
-    GP_train, SNGP_train, SNGP_val = load_data_train("./dataset/Data/Noisy/"+args.dataset,
+    GP_train, GP_test, SNGP_train, SNGP_val, SNGP_test, norm_stats = load_data_train("./dataset/Data/Noisy/"+args.dataset,
                                                              args.num_examples,
                                                              train_percentage= args.tr_ratio,
                                                              random_state=args.seed)
-    GP_test, SNGP_test = load_data_test("./dataset/Data/Noisy/"+args.dataset,
-                                         random_state=args.seed)
-    GP_test_clean, SNGP_test_clean = load_data_test("./dataset/Data/Clean/"+args.dataset,
-                                         random_state=args.seed)
+    # GP_test, SNGP_test = load_data_test("./dataset/Data/Noisy/"+args.dataset,
+    #                                      random_state=args.seed)
+    # GP_test_clean, SNGP_test_clean = load_data_test("./dataset/Data/Clean/"+args.dataset,
+    #                                      random_state=args.seed)
     
     for x, y in SNGP_val:
         F = x.shape[1]
@@ -251,7 +251,7 @@ if __name__ == '__main__':
         sngp_model.update_precision_from_loader(SNGP_train)
         covariance = sngp_model.invert_covariance()
 
-        for (X_test, y_test), (X_clean, y_clean) in zip(GP_test, GP_test_clean):
+        for X_test, y_test in GP_test:
             mean, var = sngp_model.get_mean_variance(X_test, covariance)
 
             test_ll = score(y_test, mean, var, noise=0.1)
@@ -318,7 +318,7 @@ if __name__ == '__main__':
             else:
                 print(f"Num examples {args.num_examples} >= 25,000, skipping model save")
 
-        for (X_test, y_test), (X_clean, y_clean) in zip(GP_test, GP_test_clean):
+        for X_test, y_test in GP_test:
             results = evaluate_gp(gp, X_test, y_test)
             # print(results)
             mean, var, cov = gp.predict(X_test)

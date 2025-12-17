@@ -1,16 +1,16 @@
 import unittest
-from makeDataLoaders import load_data_test, load_data_train
+from makeDataLoaders import load_data
 import torch
 
 class test_loaders(unittest.TestCase):
 
     #Tests is the random seed actually yeilds reproducably train data sets
     def test_RndSeed_train(self):
-        GP_train_A, SNGP_train_A, SNGP_val_A = load_data_train("Data/Noisy/Sin",
+        GP_train_A, GP_test_A, SNGP_train_A, SNGP_val_A, SNGP_test_A = load_data("Data/Noisy/Sin",
                                                                          10_000,
                                                                          random_state=42,
                                                                          shuffle=False)
-        GP_train_B, SNGP_train_B, SNGP_val_B = load_data_train("Data/Noisy/Sin",
+        GP_train_B, GP_test_B, SNGP_train_B, SNGP_val_B, SNGP_test_B = load_data("Data/Noisy/Sin",
                                                                          10_000,
                                                                          random_state=42,
                                                                          shuffle=False)
@@ -18,6 +18,12 @@ class test_loaders(unittest.TestCase):
         #Test equality for GP Train
         for x_A, y_A in GP_train_A:
             for x_B, y_B in GP_train_B:
+                self.assertTrue(torch.equal(x_A, x_B))
+                self.assertTrue(torch.equal(y_A, y_B))
+
+        #Test equality for GP Test
+        for x_A, y_A in GP_test_A:
+            for x_B, y_B in GP_test_B:
                 self.assertTrue(torch.equal(x_A, x_B))
                 self.assertTrue(torch.equal(y_A, y_B))
 
@@ -33,9 +39,15 @@ class test_loaders(unittest.TestCase):
                 self.assertTrue(torch.equal(x_A, x_B))
                 self.assertTrue(torch.equal(y_A, y_B))
 
+        #Test equality for SNGP Test
+        for x_A, y_A in SNGP_test_A:
+            for x_B, y_B in GP_test_B:
+                self.assertTrue(torch.equal(x_A, x_B))
+                self.assertTrue(torch.equal(y_A, y_B.unsqueeze(-1)))
+
     #Test if the dataLoaders for GP and SNGP contain the same data for train load
     def test_SNGP_GP_Loads_equals_train(self):
-        GP_train, SNGP_train, SNGP_val = load_data_train("Data/Noisy/Sin",
+        GP_train, GP_test, SNGP_train, SNGP_val, SNGP_test = load_data("Data/Noisy/Sin",
                                                                   10_000,
                                                                   random_state=12345,
                                                                   shuffle=False)
@@ -47,13 +59,21 @@ class test_loaders(unittest.TestCase):
                     self.assertTrue(torch.equal(x_GP, torch.cat([x_SNGP_tr, x_SNGP_val])))
                 #Have to add an extra dimension to SNGP y
                     self.assertTrue(torch.equal(y_GP.unsqueeze(-1),torch.cat([y_SNGP_tr, y_SNGP_val])))
+
+
+        #Test that test is equal
+        for x_GP, y_GP in GP_test:
+            for x_SNGP, y_SNGP in SNGP_test:
+                self.assertTrue(torch.equal(x_GP, x_SNGP))
+                self.assertTrue(torch.equal(y_GP.unsqueeze(-1), y_SNGP))
+
                 
     #Test that different seeds yeild different results
     def test_diff_seed_train(self):
-        GP_train_A, SNGP_train_A, SNGP_val_A = load_data_train("Data/Noisy/Sin",
+        GP_train_A, GP_test_A, SNGP_train_A, SNGP_val_A, SNGP_test_A = load_data("Data/Noisy/Sin",
                                                                          10_000,
                                                                          random_state=42)
-        GP_train_B, SNGP_train_B, SNGP_val_B = load_data_train("Data/Noisy/Sin",
+        GP_train_B, GP_test_B, SNGP_train_B, SNGP_val_B, SNGP_test_B = load_data("Data/Noisy/Sin",
                                                                          10_000,
                                                                          random_state=6789)
         
@@ -62,6 +82,12 @@ class test_loaders(unittest.TestCase):
             for x_B, y_B in GP_train_B:
                 self.assertTrue(not torch.equal(x_A, x_B))
                 self.assertTrue(not torch.equal(y_A, y_B))
+
+        for x_A, y_A in GP_test_A:
+            for x_B, y_B in GP_test_B:
+                self.assertTrue(not torch.equal(x_A, x_B))
+                self.assertTrue(not torch.equal(y_A, y_B))
+
 
         #Test inequality for SNGP train
         for x_A, y_A in SNGP_train_A:
@@ -75,60 +101,11 @@ class test_loaders(unittest.TestCase):
                 self.assertTrue(not torch.equal(x_A, x_B))
                 self.assertTrue(not torch.equal(y_A, y_B))
 
-    #Tests is the random seed actually yeilds reproducably test data sets
-    def test_Rndseed_testSet(self):
-        GP_test_A, SNGP_test_A = load_data_test("Data/Clean/CrazySin",
-                                                10_000,
-                                                random_state=1337,
-                                                shuffle=False)
-        GP_test_B, SNGP_test_B = load_data_test("Data/Clean/CrazySin",
-                                                10_000,
-                                                random_state=1337,
-                                                shuffle=False)
-        
-        for x_A, y_A in GP_test_A:
-            for x_B, y_B in GP_test_B:
-                self.assertTrue(torch.equal(x_A,x_B))
-                self.assertTrue(torch.equal(y_A,y_B))
 
         for x_A, y_A in SNGP_test_A:
             for x_B, y_B in SNGP_test_B:
-                self.assertTrue(torch.equal(x_A,x_B))
-                self.assertTrue(torch.equal(y_A,y_B))
-    
-    #Test if the dataLoaders for GP and SNGP contain the same data for test load
-    def test_SNGP_GP_Loads_equals_testSet(self):
-        GP_test, SNGP_test = load_data_test("Data/Clean/CrazySin",
-                                            10_000,
-                                            random_state=54321,
-                                            shuffle=False)
-        
-        for x_GP, y_GP in GP_test:
-            for x_SNGP, y_SNGP in SNGP_test:
-                self.assertTrue(torch.equal(x_GP,x_SNGP))
-                self.assertTrue(torch.equal(y_GP.unsqueeze(-1),y_SNGP))
-
-    #Test that different seeds yeild different results
-    def test_diff_seed_testSet(self):
-        GP_test_A, SNGP_test_A = load_data_test("Data/Clean/CrazySin",
-                                                10_000,
-                                                random_state=123,
-                                                shuffle=False)
-        GP_test_B, SNGP_test_B = load_data_test("Data/Clean/CrazySin",
-                                                10_000,
-                                                random_state=789,
-                                                shuffle=False)
-        
-        for x_A, y_A in GP_test_A:
-            for x_B, y_B in GP_test_B:
-                self.assertTrue(not torch.equal(x_A,x_B))
-                self.assertTrue(not torch.equal(y_A,y_B))
-
-        for x_A, y_A in SNGP_test_A:
-            for x_B, y_B in SNGP_test_B:
-                self.assertTrue(not torch.equal(x_A,x_B))
-                self.assertTrue(not torch.equal(y_A,y_B))
-        
+                self.assertTrue(not torch.equal(x_A, x_B))
+                self.assertTrue(not torch.equal(y_A, y_B))
 
 if __name__ == '__main__':
     unittest.main()

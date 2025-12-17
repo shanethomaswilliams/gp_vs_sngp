@@ -18,61 +18,77 @@ Returns:
     SNGP_valid_loader: Val Loader formated for SNGP y is (N)
     
 '''
-def load_data_train(file_path, sample_size, train_percentage = 0.75, random_state=42, shuffle = True):
-    #Makes sure the splits make sense
-    assert train_percentage < 1.0
+def load_data_train(file_path, sample_size, train_percentage = 0.70, random_state=42, shuffle = True,
+              num_test = 10_000, standardize_x=True, standardize_y=True, eps=1e-8):
 
-
-    #Load data
     tensor_DF = torch.load(file_path)
     x_DF = tensor_DF["x"].float()
-    y_D = tensor_DF["y"].float()
+    y_D  = tensor_DF["y"].float()
 
-    
-    # Random shuffle of row ids corresponding to all L provided examples
     D = len(x_DF)
     rng = np.random.default_rng(seed=random_state)
-    shuffled_ids_D = rng.permutation(np.arange(D))
+    ids = rng.permutation(np.arange(D))
 
-    #Train = N, Validation = V, Test = T
-    #Determine N, V, T
-    N = int(np.round(sample_size * (train_percentage)))
+    N = int(np.round(sample_size * train_percentage))
     V = sample_size - N
-    assert D >= N + V
 
-    #Make x_data
-    if x_DF.dim() == 1:
-        x_train_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
-        x_valid_VF = x_DF[shuffled_ids_D[N:N+V]].unsqueeze(-1)
-        x_GP_train_N = x_DF[shuffled_ids_D[0:N+V]].unsqueeze(-1)
-    else:
-        x_train_NF = x_DF[shuffled_ids_D[0:N]]
-        x_valid_VF = x_DF[shuffled_ids_D[N:N+V]]
-        x_GP_train_N = x_DF[shuffled_ids_D[0:N+V]]
+    train_ids = ids[:N]
+    val_ids   = ids[N:N+V]
+    test_ids  = ids[-num_test:]
 
+    # ---- slice raw ----
+    def slice_x(ix):
+        x = x_DF[ix]
+        return x.unsqueeze(-1) if x.dim() == 1 else x
 
-    #Make SNGP y_data
-    y_SNGP_train_N1 = y_D[shuffled_ids_D[0:N]].unsqueeze(-1)
-    y_SNGP_valid_V1 = y_D[shuffled_ids_D[N:N+V]].unsqueeze(-1)
+    x_train = slice_x(train_ids)
+    x_val   = slice_x(val_ids)
+    x_test  = slice_x(test_ids)
 
-    #Make GP y_data
-    y_GP_train_N = y_D[shuffled_ids_D[0:N+V]].squeeze()
+    y_train = y_D[train_ids]
+    y_val   = y_D[val_ids]
+    y_test  = y_D[test_ids]
 
-    #Creates datasets
-    GP_train_dataset = TensorDataset(x_GP_train_N, y_GP_train_N)
+    # ---- TRAIN-ONLY normalization ----
+    if standardize_x:
+        x_mean = x_train.mean(dim=0, keepdim=True)
+        x_std  = x_train.std(dim=0, keepdim=True).clamp_min(eps)
+        x_train = (x_train - x_mean) / x_std
+        x_val   = (x_val   - x_mean) / x_std
+        x_test  = (x_test  - x_mean) / x_std
 
-    SNGP_train_dataset = TensorDataset(x_train_NF, y_SNGP_train_N1)
-    SNGP_valid_dataset = TensorDataset(x_valid_VF, y_SNGP_valid_V1)
+    if standardize_y:
+        y_mean = y_train.mean()
+        y_std  = y_train.std().clamp_min(eps)
+        y_train = (y_train - y_mean) / y_std
+        y_val   = (y_val   - y_mean) / y_std
+        y_test  = (y_test  - y_mean) / y_std
 
-    GP_train_loader = DataLoader(GP_train_dataset, batch_size=N+V, shuffle=shuffle)
+    # ---- build loaders ----
+    GP_train_dataset = TensorDataset(torch.cat([x_train, x_val], dim=0),
+                                     torch.cat([y_train, y_val], dim=0))
+    GP_test_dataset  = TensorDataset(x_test, y_test)
 
-    SNGP_train_loader = DataLoader(SNGP_train_dataset, batch_size=N, shuffle=shuffle)
-    SNGP_valid_loader = DataLoader(SNGP_valid_dataset, batch_size=V, shuffle=shuffle)
+    SNGP_train_dataset = TensorDataset(x_train, y_train.unsqueeze(-1))
+    SNGP_valid_dataset = TensorDataset(x_val,   y_val.unsqueeze(-1))
+    SNGP_test_dataset  = TensorDataset(x_test,  y_test.unsqueeze(-1))
 
-    return GP_train_loader, SNGP_train_loader, SNGP_valid_loader
+    GP_train_loader = DataLoader(GP_train_dataset, batch_size=len(GP_train_dataset), shuffle=False)
+    GP_test_loader  = DataLoader(GP_test_dataset,  batch_size=len(GP_test_dataset),  shuffle=False)
+
+    SNGP_train_loader = DataLoader(SNGP_train_dataset, batch_size=len(SNGP_train_dataset), shuffle=shuffle)
+    SNGP_valid_loader = DataLoader(SNGP_valid_dataset, batch_size=len(SNGP_valid_dataset), shuffle=False)
+    SNGP_test_loader  = DataLoader(SNGP_test_dataset,  batch_size=len(SNGP_test_dataset),  shuffle=False)
+
+    norm_stats = {"x_mean": x_mean, "x_std": x_std, "y_mean": y_mean, "y_std": y_std}
+    return GP_train_loader, GP_test_loader, SNGP_train_loader, SNGP_valid_loader, SNGP_test_loader, norm_stats
+
 
 
 '''
+
+WE SHOULD USE THIS FUNCTION ANYMORE
+
 Inputs:
     file_path: filename to load data from
     sample_size: number of samples to receive
@@ -83,32 +99,41 @@ Returns:
     GP_test_loader: Train loader formated for GP
     SNGP_test_loader: Train loader formated for SNGP 
 '''
-def load_data_test(file_path, sample_size=1_000, random_state=42, shuffle=True):
+def load_data_test(file_path, sample_size, random_state=42, shuffle = True, exclude_list = torch.empty):
 
     #Load data
     tensor_DF = torch.load(file_path)
     x_DF = tensor_DF["x"].float()
     y_D = tensor_DF["y"].float()
 
-    
-    # Random shuffle of row ids corresponding to all L provided examples
     D = len(x_DF)
+    exMask = torch.full(size = D, fill_value=True)
+
+    for d, x in enumerate(x_DF):
+        exMask[d] = ()
+
+    exMask = torch.isin(x_DF, exclude_list)
+    avaliable_Xvals = x_DF[exMask]
+    avaliable_Yvals = y_D[exMask]
+
+    # Random shuffle of row ids corresponding to all L provided examples
+    A = len(avaliable_Xvals)
     N = sample_size
     rng = np.random.default_rng(seed=random_state)
-    shuffled_ids_D = rng.permutation(np.arange(D))
+    shuffled_ids_A = rng.permutation(np.arange(A))
 
     #Train = N, Validation = V, Test = T
     #Determine N, V, T
-    assert D >= N
+    assert A >= N
 
     #Make x_data
     if x_DF.dim() == 1:
-        x_test_NF = x_DF[shuffled_ids_D[0:N]].unsqueeze(-1)
+        x_test_NF = avaliable_Xvals[shuffled_ids_A[0:N]].unsqueeze(-1)
     else:
-        x_test_NF = x_DF[shuffled_ids_D[0:N]]
+        x_test_NF = avaliable_Xvals[shuffled_ids_A[0:N]]
 
     #Make SNGP y_data
-    y_SNGP_test_N1 = y_D[shuffled_ids_D[0:N]].unsqueeze(-1)
+    y_SNGP_test_N1 = avaliable_Yvals[shuffled_ids_A[0:N]].unsqueeze(-1)
 
     #Make GP y_data
     y_GP_test_N = y_SNGP_test_N1.squeeze()

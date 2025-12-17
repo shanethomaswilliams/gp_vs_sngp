@@ -85,59 +85,22 @@ def makeCrazySinPT(num_examples, random_state = None,
 
     return data_dict
 
-
-
 def makeFriedmanPT(n_samples, random_state=None,
-                   noise=0.1, shuffle=True,
-                   filename=None,
-                   standardize_x=True,
-                   standardize_y=True,
-                   eps=1e-8):
-
-    if random_state is None:
+                         noise = 0.1, shuffle = True,
+                         filename = None):
+    
+    if random_state==None:
         X, y = make_friedman3(n_samples=n_samples, noise=noise)
     else:
         X, y = make_friedman3(n_samples=n_samples, noise=noise, random_state=random_state)
-
-    # ---------------------------
-    # Standardize X (per feature)
-    # ---------------------------
-    x_mean = X.mean(axis=0, keepdims=True)
-    x_std  = X.std(axis=0, keepdims=True)
-
-    if standardize_x:
-        X = (X - x_mean) / (x_std + eps)
-
-    # ---------------------------
-    # Standardize y (scalar)
-    # ---------------------------
-    y_mean = y.mean()
-    y_std  = y.std()
-
-    if standardize_y:
-        y = (y - y_mean) / (y_std + eps)
-
-    # Optional shuffle (after standardization is fine)
-    if shuffle:
-        rng = np.random.default_rng(seed=random_state)
-        idx = rng.permutation(n_samples)
-        X, y = X[idx], y[idx]
-
+    
     X_tensor = torch.tensor(X, dtype=torch.float32)
     y_tensor = torch.tensor(y, dtype=torch.float32)
-
-    data_dict = {
-        'x': X_tensor,
-        'y': y_tensor,
-        # store stats so you can invert later
-        'x_mean': torch.tensor(x_mean, dtype=torch.float32),
-        'x_std': torch.tensor(x_std, dtype=torch.float32),
-        'y_mean': torch.tensor(y_mean, dtype=torch.float32),
-        'y_std': torch.tensor(y_std, dtype=torch.float32),
-    }
-
-    if filename is not None:
+    
+    data_dict = {'x':X_tensor,
+                 'y':y_tensor}
+    
+    if filename != None:
         torch.save(data_dict, filename)
 
     return data_dict
-
