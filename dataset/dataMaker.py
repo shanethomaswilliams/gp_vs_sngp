@@ -104,3 +104,23 @@ def makeFriedmanPT(n_samples, random_state=None,
         torch.save(data_dict, filename)
 
     return data_dict
+
+def makeFriedman1(n_samples, random_state=None,
+                         noise = 0.1, shuffle = True,
+                         filename = None):
+    
+    if random_state==None:
+        X, y = make_friedman1(n_samples=n_samples, n_features=5, noise=noise)
+    else:
+        X, y = make_friedman1(n_samples=n_samples, n_features=5, noise=noise, random_state=random_state)
+    
+    X_tensor = torch.tensor(X, dtype=torch.float32)
+    y_tensor = torch.tensor(y, dtype=torch.float32)
+    
+    data_dict = {'x':X_tensor,
+                 'y':y_tensor}
+    
+    if filename != None:
+        torch.save(data_dict, filename)
+
+    return data_dict
