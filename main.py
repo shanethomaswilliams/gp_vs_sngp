@@ -37,7 +37,7 @@ def get_args_parser():
     parser.add_argument("--lr", type=float, default=0.000005, help="Learning rate for SNGP optimizer")
 
     #Add arguments for dataset
-    parser.add_argument("--dataset", default="Sin", choices=["Sin", "CrazySin", "Friedman"], 
+    parser.add_argument("--dataset", default="Sin", choices=["Sin", "CrazySin", "Friedman", "Friedman1"], 
                         help="name of dataset to run")
     parser.add_argument("--num_examples", type=int, default=2_000, help="Number of examples to use for training")
     parser.add_argument("--tr_ratio", type = float, default= 0.7, help="Percent of data to use as training")
