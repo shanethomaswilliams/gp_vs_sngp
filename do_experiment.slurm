@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=SNGP_STAT_PATT    # Job name
-#SBATCH --output=/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs/%x_%j.out         # Output file (%j is job ID, %x is job name)
-#SBATCH --error=/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs/%x_%j.err          # Error file (%j is job ID, %x is job name)
+#SBATCH --output=/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs/%x_%j.out         # Output file (%j is job ID, %x is job name)
+#SBATCH --error=/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs/%x_%j.err          # Error file (%j is job ID, %x is job name)
 #SBATCH --time=03:00:00            # Time limit (HH:MM:SS)
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --ntasks=1                 # Number of tasks
@@ -23,7 +23,7 @@ echo $eval_dir
 
 JOB_ID=${SLURM_JOB_ID}
 JOB_NAME=${SLURM_JOB_NAME}
-LOG_DIR="/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs"
+LOG_DIR="/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/SNGP_FINAL_RESULTS/logs"
 OUTPUT_FILE="${LOG_DIR}/${JOB_NAME}_${JOB_ID}.out"
 ERROR_FILE="${LOG_DIR}/${JOB_NAME}_${JOB_ID}.err"
 
@@ -32,7 +32,7 @@ echo $OUTPUT_FILE
 echo $ERROR_FILE
 
 # Create symbollic links to redirect output files to train_dir
-python /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/main.py \
+python /Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/main.py \
     --modelName $model_name\
     --rank $rank\
     --lenScale $lengthscale\

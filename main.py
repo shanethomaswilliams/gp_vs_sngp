@@ -259,14 +259,25 @@ if __name__ == '__main__':
         else:
             print(f"Rank {args.rank} >= 25,000, skipping model save")
 
-
+        print("Evaluating SNGP Model...", flush=True)
+        print("Computing covariance matrix...", flush=True)
         sngp_model.update_precision_from_loader(SNGP_train, device=device)
+        print("Inverting covariance matrix...", flush=True)
         covariance = sngp_model.invert_covariance(device=device)
 
+        print(f"Covariance shape BEFORE: {covariance.shape}")
+
+        # It should be (R, R), not (1, R, R) or something weird
+        if covariance.dim() == 3:
+            covariance = covariance.squeeze(0) 
+
+
         for X_test, y_test in GP_test:
+            print("Scoring on test data...", flush=True)
             X_test = X_test.to(device)
             y_test = y_test.to(device)
             mean, var = sngp_model.get_mean_variance(X_test, covariance)
+            print("Computing test scores...", flush=True)
 
             test_ll = score(y_test, mean, var, noise=0.1)
             # test_ll_2 = score_total(y_test, mean, cov, noise=0.1)

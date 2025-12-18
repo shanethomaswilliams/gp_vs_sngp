@@ -18,21 +18,21 @@ export model_name="SNGP"
 export rank=0
 export tr_ratio=0.99
 export hyperparam_lr=0.01
-export savePath="/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS"
+export savePath="/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/SNGP_FINAL_RESULTS"
 export learn_hyperparams="False"
 export lr=0.000005
-export n_epochs=10000
+export n_epochs=50000
 
 
 ########################### HYPERPARAMETER SEARCH SPACE ################################
-declare -a datasets=("Sin" "CrazySin" "Friedman")
+declare -a datasets=("Friedman")
 # declare -a datasets=("Friedman")
 # declare -a num_examples=($(seq 5000 5000 75000))
-declare -a num_examples=(1000 5000 10000 25000 50000 75000)
-# declare -a num_examples=(75000)
+# declare -a num_examples=(1000 5000 10000 25000)
+declare -a num_examples=(1000 5000 10000)
 # declare -a num_examples=(50000)
-declare -a rank_percent=(75 1 5 15 25 50 75 100)
-# declare -a rank_percent=(1)
+# declare -a rank_percent=(1 5 15 25 50 75 100)
+declare -a rank_percent=(100.0 75.0 50.0 25.0 15.0 5.0 1.0)
 
 declare -a seeds=(1001)
 

@@ -25,7 +25,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 model_filename=None,
                 do_early_stopping=True,
                 n_epochs_without_va_improve_before_early_stop=15,
-                mse_tolerance=1e-5
+                mse_tolerance=1e-7
                 ):
     ''' Train model via stochastic gradient descent.
 
@@ -151,7 +151,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
         
         # Early stopping logic
         # If loss is dropping, track latest weights as best
-        print("Value: ", abs(best_va_mse - va_mse), ", Tolerance: ", mse_tolerance, ", Better: ", abs(best_va_mse - va_mse) > mse_tolerance, flush=True)
+        # print("Value: ", abs(best_va_mse - va_mse), ", Tolerance: ", mse_tolerance, ", Better: ", abs(best_va_mse - va_mse) > mse_tolerance, flush=True)
         if va_loss_sq < best_va_loss:
             best_epoch = epoch
             best_va_loss = va_loss_sq

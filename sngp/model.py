@@ -70,46 +70,45 @@ class RFFGP_Reg(torch.nn.Module):
         self.eval()
         cov_inv_RR = self.precision_mat.to(device)
 
-        rank = self.rank
-
-        # with torch.nograd():
-        for X,_ in data_loader:
-            X = X.to(device)
-
-            #Just need features for regression case
-            features_NR = self.featurize(X)
-            batch_size = features_NR.shape[0]
-
-            for i in range(batch_size):
-                ## RE-ORIENT DIMENSIONS OF FEATURES TO CREATE PHI FROM SNGP PAPER
-                phi_R1 = features_NR[i].unsqueeze(1)
-                outer_product_RR = phi_R1 @ phi_R1.t()
-
-                cov_inv_RR += outer_product_RR
-
-        #Add identity at end according to formula
-        cov_inv_RR += torch.eye(rank, device=device)
-
-        ## UPDATE COVARIANCE VARIABLE
+        with torch.no_grad():  # ← Add this! No gradients needed
+            for X, _ in data_loader:
+                X = X.to(device)
+                
+                # Featurize entire batch
+                features_NR = self.featurize(X)  # (N, R)
+                
+                # Vectorized: Φᵀ @ Φ = sum of all outer products
+                cov_inv_RR += features_NR.T @ features_NR  # (R, R)
+        
+        # Add identity at end
+        cov_inv_RR += torch.eye(self.rank, device=device)
+        
+        # Update precision
         self.precision_mat = cov_inv_RR
 
     def get_mean_variance(self, X_test, covariance, noise=0.0, device='cpu'):
-        features_NR = self.featurize(X_test).squeeze()
-        N = features_NR.shape[0]
-
-        mean_N = self.linear(features_NR)
-        var_N = []
-        for n in range(N):
-            phi_R = features_NR[n]  # (R,)
-            var = phi_R.T @ covariance @ phi_R  # scalar
-            if noise > 0:
-                var = var + noise**2
-            var_N.append(var)
-
-        var_N = torch.stack(var_N)  # (N,)
-
-        mean_N = mean_N.squeeze()
-        var_N = var_N.squeeze()
+        features_NR = self.featurize(X_test)  # Should be (N, R)
+        
+        # Debug: Check shapes
+        print(f"features_NR shape: {features_NR.shape}")
+        print(f"covariance shape: {covariance.shape}")
+        
+        # Ensure features_NR is 2D: (N, R)
+        if features_NR.dim() == 1:
+            features_NR = features_NR.unsqueeze(0)  # (1, R) if only one sample
+        
+        mean_N = self.linear(features_NR)  # (N, 1)
+        mean_N = mean_N.squeeze(-1)  # (N,)
+        
+        # Vectorized variance computation
+        # var[i] = features[i] @ cov @ features[i].T
+        var_N = torch.sum((features_NR @ covariance) * features_NR, dim=1)  # (N,)
+        
+        if noise > 0:
+            var_N = var_N + noise**2
+    
+        print(f"Returning mean shape: {mean_N.shape}, var shape: {var_N.shape}")
+        
         return mean_N, var_N
 
     def invert_covariance(self, device='cpu'):

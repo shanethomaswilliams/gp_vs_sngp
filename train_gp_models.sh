@@ -18,7 +18,7 @@ export model_name="GP"
 export rank=0
 export tr_ratio=0.99
 export hyperparam_lr=0.01
-export savePath="/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS"
+export savePath="/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/GP_FINAL_RESULTS"
 export learn_hyperparams="False"
 export lr=0.0005
 export n_epochs=10000
@@ -27,8 +27,8 @@ export n_epochs=10000
 ########################### HYPERPARAMETER SEARCH SPACE ################################
 declare -a datasets=("Sin" "CrazySin" "Friedman")
 # declare -a datasets=("Friedman")
-declare -a num_examples=($(seq 5000 5000 75000))
-# declare -a num_examples=(1000)
+declare -a num_examples=($(seq 100 100 1000))
+# declare -a num_examples=($(seq 5000 5000 45000))
 declare -a seeds=(1001)
 
 
