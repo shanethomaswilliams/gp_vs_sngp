@@ -152,8 +152,11 @@ class FullGPCholesky(nn.Module):
         K_XX = self.kernel(X_train, X_train)
         
         # K̂_XX = K_XX + σ²I: noisy kernel matrix
-        K_XX_noisy = K_XX + (self.noise**2 * torch.eye(N))
-        del K_XX  # Free memory immediately
+        jitter = 1e-3  # Increase to 1e-3 if this still fails
+    
+        # K̂_XX = K_XX + σ²I + jitter*I
+        K_XX_noisy = K_XX + (self.noise**2 + jitter) * torch.eye(N, dtype=K_XX.dtype, device=K_XX.device)
+        del K_XX
         
         # Cholesky decomposition: K̂_XX = L L^T
         # L is lower triangular, shape (N, N)

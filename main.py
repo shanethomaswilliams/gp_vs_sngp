@@ -10,7 +10,6 @@ import json
 import numpy as np
 import scipy.stats
 
-
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -189,14 +188,17 @@ if __name__ == '__main__':
     print(f"  - noise: {args.noise}", flush=True)
     print("===================", flush=True)
 
+    # if args.modelName == "GP":
+    #     torch.set_default_dtype(torch.float64)
+
     #Check if cuda is avaliable
     print("Checking CUDA availability...", flush=True)
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Using CUDA:", torch.cuda.get_device_name(device))
-    # elif torch.backends.mps.is_available():
-    #     device = torch.device("mps")
-    #     print("Using MPS")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using MPS")
     else:
         device = torch.device("cpu")
         print("Using CPU")

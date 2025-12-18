@@ -26,7 +26,7 @@ dtmk.makeCrazySinPT(175_000, random_state=42,
                     filename= dataC + "/CrazySin")
 
 #Make Noisy Friedman data for train and val
-dtmk.makeFriedman1(175_000, random_state=1337,
+dtmk.makeFriedman1(175_000, random_state=1001,
                     noise = 0.1,
                     filename= dataN + "/Friedman")
 #Make Clean Friedman data for testing

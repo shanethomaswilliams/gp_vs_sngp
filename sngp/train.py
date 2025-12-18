@@ -25,7 +25,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 model_filename=None,
                 do_early_stopping=True,
                 n_epochs_without_va_improve_before_early_stop=15,
-                mse_tolerance=1e-7
+                mse_tolerance=1e-5
                 ):
     ''' Train model via stochastic gradient descent.
 

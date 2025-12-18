@@ -11,8 +11,8 @@
 
 
 # Load any necessary modules for your environment
-module load cuda/11.2
-source activate Echo_MIL
+# module load cuda/11.2
+source activate basic-ml
 
 modelID=$(printf "SNGP_R%d_LS%.2f_OS%.2f_%d%s" \
     "$rank" "$lengthscale" "$outputscale" "$num_example" "$dataset")

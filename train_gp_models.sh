@@ -19,16 +19,16 @@ export rank=0
 export tr_ratio=0.99
 export hyperparam_lr=0.01
 export savePath="/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/GP_FINAL_RESULTS"
-export learn_hyperparams="False"
+export learn_hyperparams="True"
 export lr=0.0005
 export n_epochs=10000
 
 
 ########################### HYPERPARAMETER SEARCH SPACE ################################
-declare -a datasets=("Sin" "CrazySin" "Friedman")
+declare -a datasets=("Friedman")
 # declare -a datasets=("Friedman")
-declare -a num_examples=($(seq 100 100 1000))
-# declare -a num_examples=($(seq 5000 5000 45000))
+# declare -a num_examples=($(seq 100 100 1000))
+declare -a num_examples=(5000)
 declare -a seeds=(1001)
 
 
@@ -69,7 +69,7 @@ for dataset in "${datasets[@]}"; do
                     ;;
                 Friedman)
                     export lengthscale=1.154271
-                    export outputscale=26.312668
+                    export outputscale=1.312668
                     export noise=0.137135
                     ;;
             esac

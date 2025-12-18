@@ -20,7 +20,7 @@ export tr_ratio=0.99
 export hyperparam_lr=0.01
 export savePath="/Users/shanewilliams/GradSchool/Fall2025/Statistical_Pattern_Recognition/final-project/gp_vs_sngp/results/SNGP_FINAL_RESULTS"
 export learn_hyperparams="False"
-export lr=0.000005
+export lr=0.00000005
 export n_epochs=50000
 
 
@@ -29,10 +29,10 @@ declare -a datasets=("Friedman")
 # declare -a datasets=("Friedman")
 # declare -a num_examples=($(seq 5000 5000 75000))
 # declare -a num_examples=(1000 5000 10000 25000)
-declare -a num_examples=(1000 5000 10000)
+declare -a num_examples=(1000)
 # declare -a num_examples=(50000)
 # declare -a rank_percent=(1 5 15 25 50 75 100)
-declare -a rank_percent=(100.0 75.0 50.0 25.0 15.0 5.0 1.0)
+declare -a rank_percent=(500 75 50 25 15 5 1)
 
 declare -a seeds=(1001)
 
@@ -75,6 +75,11 @@ for dataset in "${datasets[@]}"; do
                         export lengthscale=0.25
                         export outputscale=2.75
                         export noise=0.1
+                        ;;
+                    Friedman)
+                        export lengthscale=1.25
+                        export outputscale=10.0
+                        export noise=0.125
                         ;;
                 esac
                 
