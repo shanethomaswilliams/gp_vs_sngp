@@ -1,0 +1,13 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/11.2"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/11.2"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+  0%|          | 0/10001 [00:00<?, ?it/s]  0%|          | 0/10001 [00:08<?, ?it/s, tr_loss=nan, tr_sqloss=nan, tr_mse=nan, va_loss=tensor(902.9318), va_sqloss=903, va_mse=1.2, batch_done=1]  0%|          | 2/10001 [00:08<11:14:18,  4.05s/it, tr_loss=nan, tr_sqloss=nan, tr_mse=nan, va_loss=tensor(902.9318), va_sqloss=903, va_mse=1.2, batch_done=1]  0%|          | 2/10001 [00:14<11:14:18,  4.05s/it, tr_loss=8.6e+4, tr_sqloss=8.6e+4, tr_mse=1.16, va_loss=tensor(343.5816), va_sqloss=344, va_mse=0.458, batch_done=1]  0%|          | 3/10001 [00:14<14:26:58,  5.20s/it, tr_loss=8.6e+4, tr_sqloss=8.6e+4, tr_mse=1.16, va_loss=tensor(343.5816), va_sqloss=344, va_mse=0.458, batch_done=1]  0%|          | 3/10001 [00:21<14:26:58,  5.20s/it, tr_loss=3.33e+4, tr_sqloss=3.33e+4, tr_mse=0.449, va_loss=tensor(326.5208), va_sqloss=327, va_mse=0.435, batch_done=1]  0%|          | 4/10001 [00:21<16:15:18,  5.85s/it, tr_loss=3.33e+4, tr_sqloss=3.33e+4, tr_mse=0.449, va_loss=tensor(326.5208), va_sqloss=327, va_mse=0.435, batch_done=1]  0%|          | 4/10001 [00:28<16:15:18,  5.85s/it, tr_loss=3.12e+4, tr_sqloss=3.12e+4, tr_mse=0.421, va_loss=tensor(470.6852), va_sqloss=471, va_mse=0.628, batch_done=1]  0%|          | 5/10001 [00:28<17:26:06,  6.28s/it, tr_loss=3.12e+4, tr_sqloss=3.12e+4, tr_mse=0.421, va_loss=tensor(470.6852), va_sqloss=471, va_mse=0.628, batch_done=1]  0%|          | 5/10001 [00:35<17:26:06,  6.28s/it, tr_loss=4.58e+4, tr_sqloss=4.58e+4, tr_mse=0.617, va_loss=tensor(841.2192), va_sqloss=841, va_mse=1.12, batch_done=1]   0%|          | 6/10001 [00:35<17:47:10,  6.41s/it, tr_loss=4.58e+4, tr_sqloss=4.58e+4, tr_mse=0.617, va_loss=tensor(841.2192), va_sqloss=841, va_mse=1.12, batch_done=1]  0%|          | 6/10001 [00:42<17:47:10,  6.41s/it, tr_loss=8.17e+4, tr_sqloss=8.17e+4, tr_mse=1.1, va_loss=tensor(1616.8538), va_sqloss=1.62e+3, va_mse=2.16, batch_done=1]  0%|          | 7/10001 [00:42<18:26:18,  6.64s/it, tr_loss=8.17e+4, tr_sqloss=8.17e+4, tr_mse=1.1, va_loss=tensor(1616.8538), va_sqloss=1.62e+3, va_mse=2.16, batch_done=1]slurmstepd: error: *** JOB 25174053 ON d1cmp017 CANCELLED AT 2025-12-17T22:53:13 ***

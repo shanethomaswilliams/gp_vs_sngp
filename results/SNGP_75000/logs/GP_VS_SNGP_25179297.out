@@ -1,0 +1,25 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R3750_LS1.25_OS1.75_75000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R3750_LS1.25_OS1.75_75000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25179297.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25179297.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=75000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 75000
+  - seed: 1001
+  - rank (for SNGP): 3750
+  - lengthscale: 1.25
+  - outputscale: 1.75
+  - noise: 0.1
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...

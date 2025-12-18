@@ -1,0 +1,23 @@
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/GP/Sin_25000_1001/logs
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/logs/GP_VS_SNGP_25133966.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/logs/GP_VS_SNGP_25133966.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=25000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 25000
+  - seed: 1001
+  - rank (for SNGP): 18750
+  - lengthscale: 1.226761
+  - outputscale: 1.805912
+  - noise: 0.100047
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...

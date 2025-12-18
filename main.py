@@ -30,6 +30,7 @@ def get_args_parser():
     parser.add_argument("--rank", type=int, default=1000, help = "Rank to run for SNGP, not need for GP")
     parser.add_argument("--lenScale", type=float, default=1)
     parser.add_argument("--outScale", type=float, default = 1)
+    parser.add_argument("--noise", type=float, default=0.1)
 
     #Training arguments
     parser.add_argument("--batch_size", type=int, default=128, help="Batch size for training SNGP")
@@ -83,7 +84,7 @@ def score(y_N, mean_N, var_N, noise):
     var_np = var_N.detach().cpu().numpy()
     std_np = np.sqrt(var_np)
 
-    total_log_proba = scipy.stats.norm.logpdf(y_N, mean_np, std_np)
+    total_log_proba = scipy.stats.norm.logpdf(y_np, mean_np, std_np)
     return np.sum(total_log_proba) / N
 
 def score_mse_rmse(y_N, mean_N):
@@ -170,21 +171,32 @@ def score_total(t_N, mean_N, cov, noise=0.0):
 
 
 if __name__ == '__main__':
-
     #Get arguments
     print("Parsing arguments...", flush=True)
     parser = get_args_parser()
     args = parser.parse_args()
     print(f"Arguments parsed! Running {args.modelName} on {args.dataset} with N={args.num_examples}", flush=True)
+    print("EXPERIMENT SUMMARY", flush=True)
+    print("===================", flush=True)
+    print("  - Model Training for SNGP and GP on Regression Tasks", flush=True)
+    print(f"  - modelName: {args.modelName}", flush=True)
+    print(f"  - dataset: {args.dataset}", flush=True)
+    print(f"  - num_examples: {args.num_examples}", flush=True)
+    print(f"  - seed: {args.seed}", flush=True)
+    print(f"  - rank (for SNGP): {args.rank}", flush=True)
+    print(f"  - lengthscale: {args.lenScale}", flush=True)
+    print(f"  - outputscale: {args.outScale}", flush=True)
+    print(f"  - noise: {args.noise}", flush=True)
+    print("===================", flush=True)
 
     #Check if cuda is avaliable
     print("Checking CUDA availability...", flush=True)
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Using CUDA:", torch.cuda.get_device_name(device))
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("Using MPS")
+    # elif torch.backends.mps.is_available():
+    #     device = torch.device("mps")
+    #     print("Using MPS")
     else:
         device = torch.device("cpu")
         print("Using CPU")
@@ -231,7 +243,7 @@ if __name__ == '__main__':
         # I.E. 0.001 diverges but 0.0005 converges so be careful with it
         sngp_model, info = train.train_model(sngp_model, device, 
                                                 SNGP_train, SNGP_val, l2pen_mag=1.0,
-                                                n_epochs=10_000, lr=0.0005, do_early_stopping=True)
+                                                n_epochs=args.n_epochs, lr=args.lr, do_early_stopping=True)
         torch.save(info, saveFolder + f"/SNGP/{modelID}/training_info.pt")
         if args.rank < 25_000:
             model_path = saveFolder + f"/SNGP/{modelID}/model.pt"
@@ -248,10 +260,12 @@ if __name__ == '__main__':
             print(f"Rank {args.rank} >= 25,000, skipping model save")
 
 
-        sngp_model.update_precision_from_loader(SNGP_train)
-        covariance = sngp_model.invert_covariance()
+        sngp_model.update_precision_from_loader(SNGP_train, device=device)
+        covariance = sngp_model.invert_covariance(device=device)
 
         for X_test, y_test in GP_test:
+            X_test = X_test.to(device)
+            y_test = y_test.to(device)
             mean, var = sngp_model.get_mean_variance(X_test, covariance)
 
             test_ll = score(y_test, mean, var, noise=0.1)
@@ -282,7 +296,7 @@ if __name__ == '__main__':
                               args.dataset)
         os.makedirs(saveFolder + f"/GP/{args.dataset}_{args.num_examples}_{args.seed}", exist_ok=True)
 
-        gp = FullGPCholesky(lengthscale= args.lenScale, outputscale= args.outScale, noise=0.3, learn_hyperparams=True)
+        gp = FullGPCholesky(lengthscale= args.lenScale, outputscale= args.outScale, noise= args.noise, learn_hyperparams=args.learn_hyperparams)
         for X_train, y_train in GP_train:
             if args.learn_hyperparams:
                 info = train_gp(gp, X_train, y_train, n_iterations=args.n_epochs_gp_train, lr=0.01)
@@ -302,7 +316,7 @@ if __name__ == '__main__':
                 json_path = saveFolder + f"/GP/{args.dataset}_{args.num_examples}_{args.seed}/hyperparams.json"
                 with open(json_path, "w") as f:
                     json.dump(hyperparam_dict, f, indent=4)
-
+            print("Fitting to data...", flush=True)
             gp.fit(X_train, y_train)
             
             if args.num_examples < 25_000:

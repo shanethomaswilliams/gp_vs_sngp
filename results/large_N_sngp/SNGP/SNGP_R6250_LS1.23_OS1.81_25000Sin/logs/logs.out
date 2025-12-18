@@ -1,0 +1,31 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R6250_LS1.23_OS1.81_25000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R6250_LS1.23_OS1.81_25000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/logs/GP_VS_SNGP_25137188.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/logs/GP_VS_SNGP_25137188.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=25000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 25000
+  - seed: 1001
+  - rank (for SNGP): 6250
+  - lengthscale: 1.226761
+  - outputscale: 1.805912
+  - noise: 0.100047
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...
+Stopped early.
+Finished after epoch 1166, best epoch=1151
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R6250_LS1.23_OS1.81_25000Sin/model.pt
+TEST LOG LIKELIHOOD SCORE:  0.8647608896791433
+TEST MSE:  0.010396501049399376
+TEST RMSE:  0.10196323692798615

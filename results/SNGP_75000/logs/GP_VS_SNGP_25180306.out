@@ -1,0 +1,40 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R75000_LS1.25_OS1.75_75000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R75000_LS1.25_OS1.75_75000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25180306.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25180306.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=75000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 75000
+  - seed: 1001
+  - rank (for SNGP): 75000
+  - lengthscale: 1.25
+  - outputscale: 1.75
+  - noise: 0.1
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...
+Value:  inf , Tolerance:  0.001
+Value:  0.6716152429580688 , Tolerance:  0.001
+Value:  0.20760032534599304 , Tolerance:  0.001
+Value:  0.09487760066986084 , Tolerance:  0.001
+Value:  0.04752629995346069 , Tolerance:  0.001
+Value:  0.02981381118297577 , Tolerance:  0.001
+Value:  0.020189210772514343 , Tolerance:  0.001
+Value:  0.015249945223331451 , Tolerance:  0.001
+Value:  0.011733382940292358 , Tolerance:  0.001
+Value:  0.009460419416427612 , Tolerance:  0.001
+Value:  0.007663235068321228 , Tolerance:  0.001
+Value:  0.006381705403327942 , Tolerance:  0.001
+Value:  0.005346082150936127 , Tolerance:  0.001
+Value:  0.004568822681903839 , Tolerance:  0.001
+Value:  0.0039358362555503845 , Tolerance:  0.001

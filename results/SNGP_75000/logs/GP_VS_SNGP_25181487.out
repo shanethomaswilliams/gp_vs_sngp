@@ -1,0 +1,93 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R56250_LS1.25_OS1.75_75000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R56250_LS1.25_OS1.75_75000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25181487.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25181487.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=75000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 75000
+  - seed: 1001
+  - rank (for SNGP): 56250
+  - lengthscale: 1.25
+  - outputscale: 1.75
+  - noise: 0.1
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...
+Value:  inf , Tolerance:  0.0001 , Better:  True
+Value:  0.5496222972869873 , Tolerance:  0.0001 , Better:  True
+Value:  0.21840745210647583 , Tolerance:  0.0001 , Better:  True
+Value:  0.1165395975112915 , Tolerance:  0.0001 , Better:  True
+Value:  0.06794524192810059 , Tolerance:  0.0001 , Better:  True
+Value:  0.04282195866107941 , Tolerance:  0.0001 , Better:  True
+Value:  0.02903825044631958 , Tolerance:  0.0001 , Better:  True
+Value:  0.02103276550769806 , Tolerance:  0.0001 , Better:  True
+Value:  0.016070306301116943 , Tolerance:  0.0001 , Better:  True
+Value:  0.01278020441532135 , Tolerance:  0.0001 , Better:  True
+Value:  0.010459750890731812 , Tolerance:  0.0001 , Better:  True
+Value:  0.00873740017414093 , Tolerance:  0.0001 , Better:  True
+Value:  0.0074087828397750854 , Tolerance:  0.0001 , Better:  True
+Value:  0.006355196237564087 , Tolerance:  0.0001 , Better:  True
+Value:  0.005503498017787933 , Tolerance:  0.0001 , Better:  True
+Value:  0.004805512726306915 , Tolerance:  0.0001 , Better:  True
+Value:  0.0042277127504348755 , Tolerance:  0.0001 , Better:  True
+Value:  0.0037455782294273376 , Tolerance:  0.0001 , Better:  True
+Value:  0.0033405274152755737 , Tolerance:  0.0001 , Better:  True
+Value:  0.0029980912804603577 , Tolerance:  0.0001 , Better:  True
+Value:  0.0027068667113780975 , Tolerance:  0.0001 , Better:  True
+Value:  0.0024577006697654724 , Tolerance:  0.0001 , Better:  True
+Value:  0.0022432468831539154 , Tolerance:  0.0001 , Better:  True
+Value:  0.0020575299859046936 , Tolerance:  0.0001 , Better:  True
+Value:  0.0018957406282424927 , Tolerance:  0.0001 , Better:  True
+Value:  0.001753881573677063 , Tolerance:  0.0001 , Better:  True
+Value:  0.0016287639737129211 , Tolerance:  0.0001 , Better:  True
+Value:  0.0015177354216575623 , Tolerance:  0.0001 , Better:  True
+Value:  0.0014186389744281769 , Tolerance:  0.0001 , Better:  True
+Value:  0.001329667866230011 , Tolerance:  0.0001 , Better:  True
+Value:  0.0012493543326854706 , Tolerance:  0.0001 , Better:  True
+Value:  0.0011765025556087494 , Tolerance:  0.0001 , Better:  True
+Value:  0.0011101067066192627 , Tolerance:  0.0001 , Better:  True
+Value:  0.001049283891916275 , Tolerance:  0.0001 , Better:  True
+Value:  0.0009933896362781525 , Tolerance:  0.0001 , Better:  True
+Value:  0.0009417906403541565 , Tolerance:  0.0001 , Better:  True
+Value:  0.0008940175175666809 , Tolerance:  0.0001 , Better:  True
+Value:  0.0008496195077896118 , Tolerance:  0.0001 , Better:  True
+Value:  0.0008082874119281769 , Tolerance:  0.0001 , Better:  True
+Value:  0.0007697045803070068 , Tolerance:  0.0001 , Better:  True
+Value:  0.000733550637960434 , Tolerance:  0.0001 , Better:  True
+Value:  0.0006996877491474152 , Tolerance:  0.0001 , Better:  True
+Value:  0.0006678663194179535 , Tolerance:  0.0001 , Better:  True
+Value:  0.0006379280239343643 , Tolerance:  0.0001 , Better:  True
+Value:  0.0006097238510847092 , Tolerance:  0.0001 , Better:  True
+Value:  0.0005831122398376465 , Tolerance:  0.0001 , Better:  True
+Value:  0.0005579907447099686 , Tolerance:  0.0001 , Better:  True
+Value:  0.0005342327058315277 , Tolerance:  0.0001 , Better:  True
+Value:  0.0005117598921060562 , Tolerance:  0.0001 , Better:  True
+Value:  0.0004904884845018387 , Tolerance:  0.0001 , Better:  True
+Value:  0.0004703197628259659 , Tolerance:  0.0001 , Better:  True
+Value:  0.0004512052983045578 , Tolerance:  0.0001 , Better:  True
+Value:  0.00043306685984134674 , Tolerance:  0.0001 , Better:  True
+Value:  0.000415850430727005 , Tolerance:  0.0001 , Better:  True
+Value:  0.00039950571954250336 , Tolerance:  0.0001 , Better:  True
+Value:  0.0003839712589979172 , Tolerance:  0.0001 , Better:  True
+Value:  0.0003692079335451126 , Tolerance:  0.0001 , Better:  True
+Value:  0.00035516731441020966 , Tolerance:  0.0001 , Better:  True
+Value:  0.0003418121486902237 , Tolerance:  0.0001 , Better:  True
+Value:  0.0003291107714176178 , Tolerance:  0.0001 , Better:  True
+Value:  0.0003169998526573181 , Tolerance:  0.0001 , Better:  True
+Value:  0.00030548684298992157 , Tolerance:  0.0001 , Better:  True
+Value:  0.00029451772570610046 , Tolerance:  0.0001 , Better:  True
+Value:  0.00028406456112861633 , Tolerance:  0.0001 , Better:  True
+Value:  0.0002740863710641861 , Tolerance:  0.0001 , Better:  True
+Value:  0.0002645868808031082 , Tolerance:  0.0001 , Better:  True
+Value:  0.00025553442537784576 , Tolerance:  0.0001 , Better:  True
+Value:  0.0002468843013048172 , Tolerance:  0.0001 , Better:  True

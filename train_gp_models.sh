@@ -16,19 +16,19 @@ fi
 ########################### FIXED CONFIGURATION ################################
 export model_name="GP"
 export rank=0
-export lengthscale=1.2
-export outputscale=1.9
 export tr_ratio=0.99
 export hyperparam_lr=0.01
-export savePath="/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/test"
+export savePath="/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS"
 export learn_hyperparams="False"
+export lr=0.0005
+export n_epochs=10000
 
 
 ########################### HYPERPARAMETER SEARCH SPACE ################################
-# declare -a datasets=("Sin" "CrazySin" "Friedman")
-declare -a datasets=("Friedman")
-# declare -a num_examples=($(seq 1000 1000 75000))
-declare -a num_examples=($(seq 1500 1500 1500))
+declare -a datasets=("Sin" "CrazySin" "Friedman")
+# declare -a datasets=("Friedman")
+declare -a num_examples=($(seq 5000 5000 75000))
+# declare -a num_examples=(1000)
 declare -a seeds=(1001)
 
 
@@ -56,6 +56,23 @@ for dataset in "${datasets[@]}"; do
             export num_example=$num_example
             export eval_dir="$savePath/GP/$dataset_$num_example"
             export seed=$seed
+            case "$dataset" in
+                Sin)
+                    export lengthscale=1.226761
+                    export outputscale=1.805912
+                    export noise=0.100047
+                    ;;
+                CrazySin)
+                    export lengthscale=0.276328
+                    export outputscale=2.735109
+                    export noise=0.099198
+                    ;;
+                Friedman)
+                    export lengthscale=1.154271
+                    export outputscale=26.312668
+                    export noise=0.137135
+                    ;;
+            esac
             
             echo "[$experiment_count/$total_experiments] Running: Gaussian Process on Dataset: $dataset, N = $num_example"
             

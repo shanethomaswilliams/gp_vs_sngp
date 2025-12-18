@@ -1,0 +1,29 @@
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=50000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 50000
+  - seed: 1001
+  - rank (for SNGP): 2500
+  - lengthscale: 1.226761
+  - outputscale: 1.805912
+  - noise: 0.100047
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...
+Stopped early.
+Finished after epoch 15, best epoch=0
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/SNGP/SNGP_R2500_LS1.23_OS1.81_50000Sin/model.pt
+TEST LOG LIKELIHOOD SCORE:  -6.884112152208527e+25
+TEST MSE:  1.394999280007642e+24
+TEST RMSE:  1181100933120.0
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/GP/Sin_50000_1001/logs
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/logs/GP_VS_SNGP_25132518.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_sngp/logs/GP_VS_SNGP_25132518.err

@@ -1,0 +1,11 @@
+dataset,num_examples,rank,lengthscale,outputscale,test_log_likelihood,test_mse,test_rmse,folder_path
+CrazySin,25000,250,0.28,2.74,0.8550236900526883,0.010608828626573086,0.10299916565418243,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R250_LS0.28_OS2.74_25000CrazySin
+CrazySin,25000,1250,0.28,2.74,0.8757089724065404,0.010126371867954731,0.10062987357378006,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R1250_LS0.28_OS2.74_25000CrazySin
+Sin,25000,250,1.23,1.81,0.8731542015801907,0.010218662209808826,0.10108739882707596,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R250_LS1.23_OS1.81_25000Sin
+Sin,25000,1250,1.23,1.81,0.8589589511716004,0.010519067756831646,0.10256250947713852,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R1250_LS1.23_OS1.81_25000Sin
+Sin,25000,3750,1.23,1.81,0.8733740018563916,0.010209047235548496,0.1010398268699646,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R3750_LS1.23_OS1.81_25000Sin
+Sin,25000,6250,1.23,1.81,0.8647608896791433,0.010396501049399376,0.10196323692798615,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R6250_LS1.23_OS1.81_25000Sin
+Sin,25000,12500,1.23,1.81,0.861452388166482,0.010466447100043297,0.10230565816164017,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R12500_LS1.23_OS1.81_25000Sin
+Sin,25000,18750,1.23,1.81,0.8638579406162471,0.010415804572403431,0.10205785185098648,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R18750_LS1.23_OS1.81_25000Sin
+Sin,25000,25000,1.23,1.81,0.869544679372044,0.010295440442860126,0.10146644711494446,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R25000_LS1.23_OS1.81_25000Sin
+Sin,75000,3750,1.23,1.81,0.8845757573364961,0.009980435483157635,0.09990213066339493,/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/large_N_sngp/SNGP/SNGP_R3750_LS1.23_OS1.81_75000Sin

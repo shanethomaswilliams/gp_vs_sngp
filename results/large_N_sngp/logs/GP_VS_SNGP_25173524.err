@@ -1,0 +1,21 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/11.2"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/11.2"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+usage: main.py [-h] [--modelName MODELNAME] [--rank RANK]
+               [--lenScale LENSCALE] [--outScale OUTSCALE] [--noise NOISE]
+               [--batch_size BATCH_SIZE] [--n_epochs N_EPOCHS] [--lr LR]
+               [--dataset {Sin,CrazySin,Friedman}]
+               [--num_examples NUM_EXAMPLES] [--tr_ratio TR_RATIO]
+               [--learn_hyperparams LEARN_HYPERPARAMS]
+               [--n_epochs_gp_train N_EPOCHS_GP_TRAIN] [--seed SEED]
+               [--savePath SAVEPATH]
+main.py: error: argument --n_epochs: expected one argument

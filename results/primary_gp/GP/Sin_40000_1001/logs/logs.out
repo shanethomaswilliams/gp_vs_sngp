@@ -1,0 +1,29 @@
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on Sin with N=40000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: GP
+  - dataset: Sin
+  - num_examples: 40000
+  - seed: 1001
+  - rank (for SNGP): 0
+  - lengthscale: 1.226761
+  - outputscale: 1.805912
+  - noise: 0.100047
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+Fitting to data...
+Num examples 40000 >= 25,000, skipping model save
+Warning: Cholesky failed, using eigendecomposition fallback
+TEST LOG LIKELIHOOD SCORE:  0.22951315129746316
+TEST MSE:  0.0099740419536829
+TEST RMSE:  0.09987012296915054
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_gp/GP/Sin_40000_1001/logs
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_gp/logs/GP_VS_SNGP_25079365.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/primary_gp/logs/GP_VS_SNGP_25079365.err

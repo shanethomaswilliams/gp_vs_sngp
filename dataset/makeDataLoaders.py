@@ -19,7 +19,7 @@ Returns:
     
 '''
 def load_data_train(file_path, sample_size, train_percentage = 0.70, random_state=42, shuffle = True,
-              num_test = 10_000, standardize_x=True, standardize_y=True, eps=1e-8):
+              num_test = 10_000, standardize_x=False, standardize_y=False, eps=1e-8):
 
     tensor_DF = torch.load(file_path)
     x_DF = tensor_DF["x"].float()
@@ -80,7 +80,10 @@ def load_data_train(file_path, sample_size, train_percentage = 0.70, random_stat
     SNGP_valid_loader = DataLoader(SNGP_valid_dataset, batch_size=len(SNGP_valid_dataset), shuffle=False)
     SNGP_test_loader  = DataLoader(SNGP_test_dataset,  batch_size=len(SNGP_test_dataset),  shuffle=False)
 
-    norm_stats = {"x_mean": x_mean, "x_std": x_std, "y_mean": y_mean, "y_std": y_std}
+    if standardize_x and standardize_y:
+        norm_stats = {"x_mean": x_mean, "x_std": x_std, "y_mean": y_mean, "y_std": y_std}
+    else:
+        norm_stats = None
     return GP_train_loader, GP_test_loader, SNGP_train_loader, SNGP_valid_loader, SNGP_test_loader, norm_stats
 
 

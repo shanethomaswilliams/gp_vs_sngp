@@ -1,0 +1,31 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS0.28_OS2.74_1000CrazySin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS0.28_OS2.74_1000CrazySin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182798.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182798.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on CrazySin with N=1000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: GP
+  - dataset: CrazySin
+  - num_examples: 1000
+  - seed: 1001
+  - rank (for SNGP): 0
+  - lengthscale: 0.276328
+  - outputscale: 2.735109
+  - noise: 0.099198
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+Fitting to data...
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/GP/CrazySin_1000_1001/model.pt
+Warning: Cholesky failed, using eigendecomposition fallback
+TEST LOG LIKELIHOOD SCORE:  0.8603625885791527
+TEST MSE:  0.010476448573172092
+TEST RMSE:  0.10235452651977539

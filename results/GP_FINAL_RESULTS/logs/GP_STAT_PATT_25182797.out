@@ -1,0 +1,31 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS1.23_OS1.81_1000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS1.23_OS1.81_1000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182797.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182797.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on Sin with N=1000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: GP
+  - dataset: Sin
+  - num_examples: 1000
+  - seed: 1001
+  - rank (for SNGP): 0
+  - lengthscale: 1.226761
+  - outputscale: 1.805912
+  - noise: 0.100047
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+Fitting to data...
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/GP/Sin_1000_1001/model.pt
+Warning: Cholesky failed, using eigendecomposition fallback
+TEST LOG LIKELIHOOD SCORE:  0.8810843097720621
+TEST MSE:  0.010051095858216286
+TEST RMSE:  0.10025515407323837

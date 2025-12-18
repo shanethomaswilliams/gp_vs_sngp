@@ -1,0 +1,46 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R750_LS1.25_OS1.75_75000Sin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R750_LS1.25_OS1.75_75000Sin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25180874.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25180874.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on Sin with N=75000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: Sin
+  - num_examples: 75000
+  - seed: 1001
+  - rank (for SNGP): 750
+  - lengthscale: 1.25
+  - outputscale: 1.75
+  - noise: 0.1
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...
+Value:  inf , Tolerance:  0.0001 , Better:  True
+Value:  0.5323761701583862 , Tolerance:  0.0001 , Better:  True
+Value:  0.2236793041229248 , Tolerance:  0.0001 , Better:  True
+Value:  0.1214454174041748 , Tolerance:  0.0001 , Better:  True
+Value:  0.07151609659194946 , Tolerance:  0.0001 , Better:  True
+Value:  0.0455239862203598 , Tolerance:  0.0001 , Better:  True
+Value:  0.03106662631034851 , Tolerance:  0.0001 , Better:  True
+Value:  0.022571519017219543 , Tolerance:  0.0001 , Better:  True
+Value:  0.01725628972053528 , Tolerance:  0.0001 , Better:  True
+Value:  0.013713166117668152 , Tolerance:  0.0001 , Better:  True
+Value:  0.011208727955818176 , Tolerance:  0.0001 , Better:  True
+Value:  0.009349606931209564 , Tolerance:  0.0001 , Better:  True
+Value:  0.007916487753391266 , Tolerance:  0.0001 , Better:  True
+Value:  0.006780676543712616 , Tolerance:  0.0001 , Better:  True
+Value:  0.005862481892108917 , Tolerance:  0.0001 , Better:  True
+Stopped early.
+Finished after epoch 14, best epoch=14
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_FINAL_RESULTS/SNGP/SNGP_R750_LS1.25_OS1.75_75000Sin/model.pt
+TEST LOG LIKELIHOOD SCORE:  -2.2239005482723626
+TEST MSE:  0.07294858247041702
+TEST RMSE:  0.2700899541378021

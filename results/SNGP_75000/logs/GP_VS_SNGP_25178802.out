@@ -1,0 +1,25 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/SNGP/SNGP_R750_LS0.28_OS2.74_75000CrazySin
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/SNGP/SNGP_R750_LS0.28_OS2.74_75000CrazySin/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25178802.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/SNGP_75000/logs/GP_VS_SNGP_25178802.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running SNGP on CrazySin with N=75000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: SNGP
+  - dataset: CrazySin
+  - num_examples: 75000
+  - seed: 1001
+  - rank (for SNGP): 750
+  - lengthscale: 0.276328
+  - outputscale: 2.735109
+  - noise: 0.099198
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training SNGP Model...

@@ -25,6 +25,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
                 model_filename=None,
                 do_early_stopping=True,
                 n_epochs_without_va_improve_before_early_stop=15,
+                mse_tolerance=1e-5
                 ):
     ''' Train model via stochastic gradient descent.
 
@@ -56,6 +57,7 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
 
     # Init vars needed for early stopping
     best_va_loss = float('inf')
+    best_va_mse = float('inf')
     curr_wait = 0 # track epochs we are waiting to early stop
 
     # Count size of datasets, for adjusting metric values to be per-example
@@ -149,12 +151,17 @@ def train_model(model, device, tr_loader, va_loader, optimizer=None,
         
         # Early stopping logic
         # If loss is dropping, track latest weights as best
+        print("Value: ", abs(best_va_mse - va_mse), ", Tolerance: ", mse_tolerance, ", Better: ", abs(best_va_mse - va_mse) > mse_tolerance, flush=True)
         if va_loss_sq < best_va_loss:
             best_epoch = epoch
             best_va_loss = va_loss_sq
             best_tr_err_rate = tr_mse
             best_va_err_rate = va_mse
-            curr_wait = 0
+            if abs(best_va_mse - va_mse) > mse_tolerance:
+                curr_wait = 0
+            else:
+                curr_wait += 1
+            best_va_mse = va_mse
             if model_filename != None:
                 model = model.cpu()
                 torch.save(model.state_dict(), model_filename)

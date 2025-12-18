@@ -1,0 +1,37 @@
+eval dir: 
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS1.15_OS26.31_1000Friedman
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/SNGP/SNGP_R0_LS1.15_OS26.31_1000Friedman/logs/logs.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182462.out
+/cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/logs/GP_STAT_PATT_25182462.err
+Starting imports...
+Parsing arguments...
+Arguments parsed! Running GP on Friedman with N=1000
+EXPERIMENT SUMMARY
+===================
+  - Model Training for SNGP and GP on Regression Tasks
+  - modelName: GP
+  - dataset: Friedman
+  - num_examples: 1000
+  - seed: 1001
+  - rank (for SNGP): 0
+  - lengthscale: 1.154271
+  - outputscale: 26.312668
+  - noise: 0.137135
+===================
+Checking CUDA availability...
+Using CPU
+Making Datasets...
+Making Model...
+Training Gaussian Process...
+
+Early stop at iter 276
+Learned Hyperparams: 
+Lengthscale: 1.2040677070617676
+Outputscale: 30.591005325317383
+Noise: 0.12330517172813416
+Fitting to data...
+Model saved to /cluster/tufts/hugheslab/swilli26/stat-patt-final/gp_vs_sngp/results/GP_FINAL_RESULTS/GP/Friedman_1000_1001/model.pt
+Warning: Cholesky failed, using eigendecomposition fallback
+TEST LOG LIKELIHOOD SCORE:  0.6339784765503885
+TEST MSE:  0.017466239631175995
+TEST RMSE:  0.13215990364551544

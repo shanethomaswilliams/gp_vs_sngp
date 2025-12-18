@@ -88,7 +88,7 @@ class RFFGP_Reg(torch.nn.Module):
                 cov_inv_RR += outer_product_RR
 
         #Add identity at end according to formula
-        cov_inv_RR += np.eye(rank)
+        cov_inv_RR += torch.eye(rank, device=device)
 
         ## UPDATE COVARIANCE VARIABLE
         self.precision_mat = cov_inv_RR
@@ -114,7 +114,7 @@ class RFFGP_Reg(torch.nn.Module):
 
     def invert_covariance(self, device='cpu'):
         covariance_RR = torch.inverse(self.precision_mat)
-        return torch.tensor(covariance_RR, dtype=torch.float32).to(device)
+        return covariance_RR.clone().detach().to(device)
     
     @property
     def lengthscale(self):
