@@ -10,9 +10,9 @@ parser.add_argument('sngp_csv_path', type=str, help='Path to the RFF + Laplace C
 parser.add_argument('gp_csv_path', type=str, help='Path to the GP CSV file')
 parser.add_argument('--output_dir', type=str, default='./plots', 
                     help='Directory to save plots (default: ./plots)')
-parser.add_argument('--ll_zoom_min', type=float, default=0,
+parser.add_argument('--ll_zoom_min', type=float, default=0.0,
                     help='Minimum y-axis value for zoomed log likelihood plots (default: -5.0)')
-parser.add_argument('--ll_zoom_max', type=float, default=0.9,
+parser.add_argument('--ll_zoom_max', type=float, default=1.0,
                     help='Maximum y-axis value for zoomed log likelihood plots (default: 1.0)')
 parser.add_argument('--mse_zoom_min', type=float, default=0.0,
                     help='Minimum y-axis value for zoomed MSE plots (auto if not specified)')
@@ -65,14 +65,7 @@ for dataset_name in datasets:
                                           ('test_mse', 'MSE', 'Test MSE')]:
         # Regular plot
         fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-        if dataset_name == 'CrazySin':
-            fig.suptitle(f'High Variance Sine Dataset - GP vs RFF + Laplace {metric_name}', 
-                     fontsize=16, fontweight='bold')
-        elif dataset_name == 'Sin':
-            fig.suptitle(f'Sine Dataset - GP vs RFF + Laplace {metric_name}', 
-                     fontsize=16, fontweight='bold')
-        else:
-            fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name}', 
+        fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name}', 
                      fontsize=16, fontweight='bold')
         
         # Store handles for legend grouping
@@ -113,6 +106,7 @@ for dataset_name in datasets:
         
         ax.set_xlabel('Rank (% of Dataset Size)', fontsize=12)
         ax.set_ylabel(y_label, fontsize=12)
+        # ax.set_title(f'{y_label} Comparison', fontsize=13, fontweight='bold')
         
         # Create grouped legend: all RFF + Laplace, then all GP
         all_handles = rff_handles + gp_handles
@@ -129,14 +123,7 @@ for dataset_name in datasets:
         
         # Create ZOOMED version
         fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-        if dataset_name == 'CrazySin':
-            fig.suptitle(f'High Variance Sine Dataset - GP vs RFF + Laplace {metric_name}  (ZOOMED)', 
-                     fontsize=16, fontweight='bold')
-        elif dataset_name == 'Sin':
-            fig.suptitle(f'Sine Dataset - GP vs RFF + Laplace {metric_name}  (ZOOMED)', 
-                     fontsize=16, fontweight='bold')
-        else:
-            fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name} (ZOOMED)', 
+        fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name} (ZOOMED)', 
                      fontsize=16, fontweight='bold')
         
         # Store handles for legend grouping
@@ -175,6 +162,7 @@ for dataset_name in datasets:
         
         ax.set_xlabel('Rank (% of Dataset Size)', fontsize=12)
         ax.set_ylabel(y_label, fontsize=12)
+        ax.set_title(f'{y_label} Comparison (ZOOMED)', fontsize=13, fontweight='bold')
         
         # Set zoom limits
         if metric == 'test_log_likelihood':
@@ -201,6 +189,112 @@ for dataset_name in datasets:
         output_path = output_dir / f'gp_vs_rff_{dataset_name.lower()}_{metric_name.lower()}_comparison_ZOOMED.png'
         plt.savefig(output_path, dpi=300, bbox_inches='tight')
         print(f"Saved ZOOMED {metric_name} comparison plot for {dataset_name} to {output_path}")
+        plt.close()
+        
+        # Create SIDE-BY-SIDE version (regular + zoomed)
+        fig, axes = plt.subplots(1, 2, figsize=(18, 6))
+        if dataset_name == 'CrazySin':
+            fig.suptitle(f'High Variance Sine Dataset - GP vs RFF + Laplace {metric_name}', 
+                     fontsize=16, fontweight='bold')
+        elif dataset_name == 'Sin':
+            fig.suptitle(f'Sine Dataset - GP vs RFF + Laplace {metric_name}', 
+                     fontsize=16, fontweight='bold')
+        else:
+            fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name}', 
+                     fontsize=16, fontweight='bold')
+        
+        # Left plot: Regular (full scale)
+        rff_handles = []
+        gp_handles = []
+        
+        for idx, size in enumerate(common_sizes):
+            sngp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                       (dataset_df['method'] == 'RFF + Laplace')].sort_values('rank_percentage')
+            gp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                     (dataset_df['method'] == 'GP')]
+            
+            if len(sngp_size_df) > 0:
+                line, = axes[0].plot(sngp_size_df['rank_percentage'], 
+                            sngp_size_df[metric], 
+                            'o-', color=blue_colors[idx], linewidth=2, 
+                            markersize=6, label=f'RFF + Laplace N={int(size):,}')
+                rff_handles.append(line)
+            
+            if len(gp_size_df) > 0:
+                gp_val = gp_size_df[metric].values[0]
+                if len(sngp_size_df) > 0:
+                    x_range = [sngp_size_df['rank_percentage'].min(), 
+                              sngp_size_df['rank_percentage'].max()]
+                    line, = axes[0].plot(x_range, [gp_val, gp_val], 
+                                '--', color=red_colors[idx], linewidth=2.5, 
+                                label=f'GP N={int(size):,}')
+                    axes[0].plot([x_range[0]], [gp_val], 'D', color=red_colors[idx], 
+                                markersize=8, markeredgecolor='darkred', markeredgewidth=1.5)
+                    gp_handles.append(line)
+        
+        axes[0].set_xlabel('Rank (% of Dataset Size)', fontsize=12)
+        axes[0].set_ylabel(y_label, fontsize=12)
+        axes[0].set_title('Full Scale', fontsize=13, fontweight='bold')
+        all_handles = rff_handles + gp_handles
+        axes[0].legend(handles=all_handles, loc='best', fontsize=9, ncol=2)
+        axes[0].grid(True, alpha=0.3)
+        
+        # Right plot: Zoomed
+        rff_handles = []
+        gp_handles = []
+        
+        for idx, size in enumerate(common_sizes):
+            sngp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                       (dataset_df['method'] == 'RFF + Laplace')].sort_values('rank_percentage')
+            gp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                     (dataset_df['method'] == 'GP')]
+            
+            if len(sngp_size_df) > 0:
+                line, = axes[1].plot(sngp_size_df['rank_percentage'], 
+                            sngp_size_df[metric], 
+                            'o-', color=blue_colors[idx], linewidth=2, 
+                            markersize=6, label=f'RFF + Laplace N={int(size):,}')
+                rff_handles.append(line)
+            
+            if len(gp_size_df) > 0:
+                gp_val = gp_size_df[metric].values[0]
+                if len(sngp_size_df) > 0:
+                    x_range = [sngp_size_df['rank_percentage'].min(), 
+                              sngp_size_df['rank_percentage'].max()]
+                    line, = axes[1].plot(x_range, [gp_val, gp_val], 
+                                '--', color=red_colors[idx], linewidth=2.5, 
+                                label=f'GP N={int(size):,}')
+                    axes[1].plot([x_range[0]], [gp_val], 'D', color=red_colors[idx], 
+                                markersize=8, markeredgecolor='darkred', markeredgewidth=1.5)
+                    gp_handles.append(line)
+        
+        axes[1].set_xlabel('Rank (% of Dataset Size)', fontsize=12)
+        axes[1].set_ylabel(y_label, fontsize=12)
+        axes[1].set_title('Zoomed View', fontsize=13, fontweight='bold')
+        
+        # Set zoom limits
+        if metric == 'test_log_likelihood':
+            axes[1].set_ylim(args.ll_zoom_min, args.ll_zoom_max)
+        else:  # MSE
+            if args.mse_zoom_min is not None and args.mse_zoom_max is not None:
+                axes[1].set_ylim(args.mse_zoom_min, args.mse_zoom_max)
+            else:
+                all_vals = dataset_df[metric].dropna()
+                if len(all_vals) > 0:
+                    val_min, val_max = all_vals.min(), all_vals.max()
+                    val_range = val_max - val_min
+                    axes[1].set_ylim(val_min - 0.1*val_range, val_max + 0.1*val_range)
+        
+        all_handles = rff_handles + gp_handles
+        axes[1].legend(handles=all_handles, loc='best', fontsize=9, ncol=2)
+        axes[1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        
+        # Save the side-by-side figure
+        output_path = output_dir / f'gp_vs_rff_{dataset_name.lower()}_{metric_name.lower()}_comparison_SIDEBYSIDE.png'
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        print(f"Saved SIDE-BY-SIDE {metric_name} comparison plot for {dataset_name} to {output_path}")
         plt.close()
 
 # Create individual subplots for each dataset size
@@ -344,6 +438,97 @@ for dataset_name in datasets:
         output_path = output_dir / f'gp_vs_rff_{dataset_name.lower()}_{metric_name.lower()}_by_size_ZOOMED.png'
         plt.savefig(output_path, dpi=300, bbox_inches='tight')
         print(f"Saved ZOOMED {metric_name} size comparison plot for {dataset_name} to {output_path}")
+        plt.close()
+        
+        # Create SIDE-BY-SIDE version (regular + zoomed)
+        fig, axes = plt.subplots(2, n_cols, figsize=(6*n_cols, 12))
+        if n_sizes == 1:
+            axes = axes.reshape(2, 1)
+        
+        fig.suptitle(f'{dataset_name} Dataset - GP vs RFF + Laplace {metric_name} by Size', 
+                     fontsize=16, fontweight='bold')
+        
+        for idx, size in enumerate(common_sizes):
+            col_idx = idx % n_cols
+            
+            # Get RFF + Laplace data
+            sngp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                       (dataset_df['method'] == 'RFF + Laplace')].sort_values('rank_percentage')
+            
+            # Get GP data
+            gp_size_df = dataset_df[(dataset_df['num_examples'] == size) & 
+                                     (dataset_df['method'] == 'GP')]
+            
+            # Top row: Regular (full scale)
+            if len(sngp_size_df) > 0:
+                axes[0, col_idx].plot(sngp_size_df['rank_percentage'], 
+                                      sngp_size_df[metric], 
+                                      'o-', color='steelblue', linewidth=2, markersize=8,
+                                      label='RFF + Laplace')
+                
+                if len(gp_size_df) > 0:
+                    gp_val = gp_size_df[metric].values[0]
+                    x_range = [sngp_size_df['rank_percentage'].min(), 
+                              sngp_size_df['rank_percentage'].max()]
+                    axes[0, col_idx].plot(x_range, [gp_val, gp_val], 
+                                         '--', color='firebrick', linewidth=2.5, label='GP')
+                    axes[0, col_idx].plot([x_range[0]], [gp_val], 'D', color='firebrick', 
+                                         markersize=10, markeredgecolor='darkred', markeredgewidth=1.5)
+            
+            axes[0, col_idx].set_xlabel('Rank (% of Dataset Size)', fontsize=11)
+            axes[0, col_idx].set_ylabel(y_label, fontsize=11)
+            axes[0, col_idx].set_title(f'N = {int(size):,} (Full Scale)', fontsize=12, fontweight='bold')
+            axes[0, col_idx].legend(loc='best', fontsize=10)
+            axes[0, col_idx].grid(True, alpha=0.3)
+            
+            # Bottom row: Zoomed
+            if len(sngp_size_df) > 0:
+                axes[1, col_idx].plot(sngp_size_df['rank_percentage'], 
+                                      sngp_size_df[metric], 
+                                      'o-', color='steelblue', linewidth=2, markersize=8,
+                                      label='RFF + Laplace')
+                
+                if len(gp_size_df) > 0:
+                    gp_val = gp_size_df[metric].values[0]
+                    x_range = [sngp_size_df['rank_percentage'].min(), 
+                              sngp_size_df['rank_percentage'].max()]
+                    axes[1, col_idx].plot(x_range, [gp_val, gp_val], 
+                                         '--', color='firebrick', linewidth=2.5, label='GP')
+                    axes[1, col_idx].plot([x_range[0]], [gp_val], 'D', color='firebrick', 
+                                         markersize=10, markeredgecolor='darkred', markeredgewidth=1.5)
+            
+            axes[1, col_idx].set_xlabel('Rank (% of Dataset Size)', fontsize=11)
+            axes[1, col_idx].set_ylabel(y_label, fontsize=11)
+            axes[1, col_idx].set_title(f'N = {int(size):,} (Zoomed)', fontsize=12, fontweight='bold')
+            
+            # Set zoom limits
+            if metric == 'test_log_likelihood':
+                axes[1, col_idx].set_ylim(args.ll_zoom_min, args.ll_zoom_max)
+            else:  # MSE
+                if args.mse_zoom_min is not None and args.mse_zoom_max is not None:
+                    axes[1, col_idx].set_ylim(args.mse_zoom_min, args.mse_zoom_max)
+                else:
+                    # Auto-zoom for this specific size
+                    size_vals = dataset_df[dataset_df['num_examples'] == size][metric].dropna()
+                    if len(size_vals) > 0:
+                        val_min, val_max = size_vals.min(), size_vals.max()
+                        val_range = val_max - val_min
+                        axes[1, col_idx].set_ylim(val_min - 0.1*val_range, val_max + 0.1*val_range)
+            
+            axes[1, col_idx].legend(loc='best', fontsize=10)
+            axes[1, col_idx].grid(True, alpha=0.3)
+        
+        # Hide any extra subplots
+        for idx in range(n_sizes, n_cols):
+            axes[0, idx].set_visible(False)
+            axes[1, idx].set_visible(False)
+        
+        plt.tight_layout()
+        
+        # Save the side-by-side figure
+        output_path = output_dir / f'gp_vs_rff_{dataset_name.lower()}_{metric_name.lower()}_by_size_SIDEBYSIDE.png'
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        print(f"Saved SIDE-BY-SIDE {metric_name} size comparison plot for {dataset_name} to {output_path}")
         plt.close()
 
 print("\nAll plots generated successfully!")
